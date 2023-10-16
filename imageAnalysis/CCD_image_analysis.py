@@ -6,8 +6,10 @@ import os
 
 # parameters
 ccdImagePath = r"labData/2023_09_29_Image Data_FW/CCD_USAF1951_Gr5-Ele1_H.png"
-pixelSize = 1.67 # micrometer
 
+pixelSize = 1.67 # micrometer
+binary_threshold = 100 # range rfom 0-255
+row_count_threshold = 30 # used in stage 3
 
 ######################################################
 # helper function
@@ -32,19 +34,20 @@ def regenerateGrayImg_mpl(arr, name):
 ######################################################
 def numpy_approach():
     # parameters
-    binaryThreshold = 100
     try:  
         os.mkdir("./output_resolution") 
     except OSError:
         pass  
     print("LOG: output will be stroed in ./output_resolution/") 
     
+    # ############################################### Stage 1
     # pixel generation from images 
     gray_array = np.array(Image.open(ccdImagePath).convert('L'))
     # image processing
-    processed_array = np.where(gray_array < binaryThreshold, 0, 255)
+    processed_array = np.where(gray_array < binary_threshold, 0, 255)
     regenerateGrayImg_mpl(processed_array, "processedARR_mpl")
 
+    # ############################################### Stage 2
     # crop image 
     # (currently index value is gnerated by manually inspecting processedARR_mpl)
     # (x1, y1) indicate top left, (x2, y2) indicate bottom right edge
@@ -78,18 +81,18 @@ def numpy_approach():
     crop_img_display[y1:y2, x1:x2] = crop_img
     regenerateGrayImg_mpl(crop_img_display, "cropped")
 
+    # ############################################### Stage 3
     # count pixels
     barWidthData = 0
     accu_pix_count = 0
     pix_count = 0
     print("LOG: Computing size of the rectangle")
-    pixel_counter = 0
     for row in crop_img:
         for col in row:
              if col == 255: pix_count += 1
-        if pix_count > 30:
-             barWidthData += 1
-        accu_pix_count += pix_count
+        if pix_count > row_count_threshold:
+            barWidthData += 1
+            accu_pix_count += pix_count
         pix_count = 0
 
     print("LOG: Total", accu_pix_count, "pixels detected in the cropped section")
@@ -102,6 +105,8 @@ def numpy_approach():
     print("green bar Width is", aveWidth/1000, "mm")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+
 ###################################################### 
 # # CV2 approach
 ######################################################
