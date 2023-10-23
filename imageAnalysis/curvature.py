@@ -1,35 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
-from PIL import Image
-
-# read image as an 2D array 
-
-def get_img(filePath):
-    file_data = []
-    gray_image = []
-    skipHeaderRows = 4
-    skipFooterRows = 4
-    with open(filePath, 'r') as file:
-        reader = csv.reader(file)    
-        for row in reader:
-            file_data.append(row[1:])
-
-    while skipFooterRows > 0:
-        del file_data[-1]
-        skipFooterRows -= 1
-
-    while skipHeaderRows > 0:
-        file_data.pop(0)
-        skipHeaderRows -= 1
-
-
-    for row in file_data:
-        gray_image.append(np.array(row, dtype = int))
-
-    print("Finish parsing the images...")
-    return gray_image
-
 
 def process_relative_value(intensity_data : np.ndarray) -> np.ndarray:
     max_val = np.amax(intensity_data)
@@ -78,29 +48,71 @@ def crop_images(gray_img):
         # plt.show()
 
 
-def main(testFilePath):
-    # [[1, 2, 3, 5], [1, 2, 3, 5]]
-    intensity_matrix = np.array(get_img(testFilePath))
-    ver_len, hor_len = intensity_matrix.shape
-    print("vertical pixel count = ", ver_len, "horizontal pixel count = ", hor_len)
+#####################################################
+# Gaussian Blur
+#####################################################
+# filter_size = length of the square filter
+# kernel generatino
+def generate_gaussian_filer(sigma, filter_size):
 
-    gray_img = process_relative_value(intensity_matrix)
-    print(gray_img)
-    pil_img = Image.fromarray(gray_img, mode = "L")
-    print(pil_img.mode)
-    pil_img.save('gray_img.png')
+    m_half = filter_size // 2
+    n_half = filter_size // 2
 
-    ## print(gray_img)
-    ## plt.figure(figsize=(hor_len/100, ver_len/100))
-    # plt.figure()
-    # plt.imshow(gray_img, cmap = 'gray')
-    # plt.title('Grayscale Image')
-    # plt.savefig('grayscaleFull.svg', format = 'svg', dpi=1200)
-    ## plt.show()
- 
+    # initializing the filter
+    gaussian_filter = np.zeros((filter_size, filter_size), np.float32)
+    normal = 1 / (2.0 * np.pi * sigma**2.0)
 
-if __name__ == '__main__':
-    testFilePath = "labData/2023_09_29_Image Data_FW\SP_USAF1951_Gr5-Ele1_H.csv"
-    testFilePath = "labData/2023_09_29_Image Data_FW\PFO-BPy VF-MCE_FS-32_C-wave_575nm_20mW_700-1500nm_Slit100_fall_Vis_F-lens_Trans_1sec_P1_2D.csv"
-    main(testFilePath)
-    print("DONEEEEEEE")
+    # generating the filter
+    for y in range(-m_half, m_half+1):
+        for x in range(-n_half, n_half+1):
+            exp_term = np.exp(-(x**2.0 + y**2.0) / (2.0 * sigma**2.0))
+            gaussian_filter[y+m_half, x+n_half] = normal * exp_term
+    print("producted gaussian filter:")
+    print(gaussian_filter)
+    return gaussian_filter
+
+
+def convolution(src, kernel):
+    ver_s, hor_s = src.shape
+    var_k, hor_k = kernel.shape
+
+    if (ver_s != var_k): return 0
+    if (hor_s != hor_k): return 0
+
+    sol = 0
+    for ind_y, row in enumerate(src):
+        for ind_x, val in enumerate(row):
+            sol += val*kernel[ind_y][ind_x]
+
+    return sol
+
+def gaussian_blur(src : np.array, kernel : np.array) -> np.array:
+    ver_s, hor_s = src.shape
+    ver_k, hor_k = kernel.shape
+    print("kernel size: vertical =", ver_k, ", horizontal =", hor_k)
+    print("source size: vertical =", ver_k, ", horizontal =", hor_k)
+
+    if (ver_k != hor_k): return 0
+    print("performing Gaussian Blur...")
+    padding = int(ver_k/2)
+    padded_src_size = (ver_s+2*padding, hor_s+2*padding)
+    padded_src = np.zeros(padded_src_size, np.float32)
+    for ind, row in enumerate(padded_src[padding:(-padding)]):
+        row[padding:(-padding)] = src[ind].copy()
+    print("padding = ", padding)
+    print(padded_src)
+    
+    res = np.zeros(src.shape, np.float32)
+    
+    for ind_y, row in enumerate(src):
+        # each pixel of the the result will be a convolution of the src and kernel
+        for ind_x, _ in enumerate(row):
+            # get submatrix
+            srcSub = np.zeros(kernel.shape, np.float32)
+            padded_rows = padded_src[ind_y : ind_y + ver_k]
+            for i, pad_row in enumerate(padded_rows):
+                srcSub[i] = pad_row[ind_x : ind_x + hor_k].copy()
+            # print(srcSub)
+            res[ind_y][ind_x] = convolution(srcSub, kernel)
+
+    return res
