@@ -60,12 +60,12 @@ def generate_gaussian_filer(sigma, filter_size):
 
     # initializing the filter
     gaussian_filter = np.zeros((filter_size, filter_size), np.float32)
-    normal = 1 / (2.0 * np.pi * sigma**2.0)
+    normal = 1 / (2 * np.pi * (sigma*sigma))
 
     # generating the filter
-    for y in range(-m_half, m_half+1):
-        for x in range(-n_half, n_half+1):
-            exp_term = np.exp(-(x**2.0 + y**2.0) / (2.0 * sigma**2.0))
+    for y in range(-m_half, m_half):
+        for x in range(-n_half, n_half):
+            exp_term = np.exp(-(x*x + y*y) / (2.0 * sigma*sigma))
             gaussian_filter[y+m_half, x+n_half] = normal * exp_term
     print("producted gaussian filter:")
     print(gaussian_filter)
@@ -86,7 +86,9 @@ def convolution(src, kernel):
 
     return sol
 
-def gaussian_blur(src : np.array, kernel : np.array) -> np.array:
+def gaussian_blur(src : np.ndarray, kernel : np.ndarray) -> np.array:
+    mean_s = src.mean()
+    print("mean: ", mean_s)
     ver_s, hor_s = src.shape
     ver_k, hor_k = kernel.shape
     print("kernel size: vertical =", ver_k, ", horizontal =", hor_k)
@@ -112,7 +114,7 @@ def gaussian_blur(src : np.array, kernel : np.array) -> np.array:
             padded_rows = padded_src[ind_y : ind_y + ver_k]
             for i, pad_row in enumerate(padded_rows):
                 srcSub[i] = pad_row[ind_x : ind_x + hor_k].copy()
-            # print(srcSub)
             res[ind_y][ind_x] = convolution(srcSub, kernel)
 
+    print(res+mean_s)
     return res

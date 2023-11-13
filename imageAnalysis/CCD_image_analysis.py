@@ -1,9 +1,12 @@
 from PIL import Image
 import numpy as np
-import cv2
 import matplotlib.pyplot as plt
-import os 
+import os
+import csv
 
+
+from pixis_analysis import get_csv_data
+from curvature import *
 # #################################################################
 # parameters ######################################################
 # #################################################################
@@ -33,29 +36,26 @@ line_pair_per_mm = lp_mm_array[element_num-1][group_num+2]
 ######################################################
 # helper function
 ######################################################
-# regenerate image from gray pixel using python image library
-def regenerateGrayImg(arr, name, csvGen = 0):
-    # regenerate image
-    pil_img = Image.fromarray(arr, 'L')
-    pil_img.save("output_resolution/" + name + '.jpg')
-    if (csvGen):
-        np.savetxt("output_resolution/" + name + ".csv", arr, delimiter=",")
-
 
 # regenerate image from gray pixel using matplotlib  
 def regenerateGrayImg_mpl(arr, name):
         plt.figure()
         plt.imshow(arr, cmap = 'gray')
-        plt.savefig("./output_resolution/" + name + ".png")
+        desnPath = "./output_resolution/" + name + ".png"
+        plt.savefig(desnPath)
+        return desnPath
 
 
-# crop image
-def crop_manual(gray_array, processed_array, display = 0):
+# manual crop image
+def crop_manual(gray_array, processed_array, name = "", display = 0):
          # crop image 
     # (currently index value is gnerated by manually inspecting processedARR_mpl)
     # (x1, y1) indicate top left, (x2, y2) indicate bottom right edge
     print("Instruction:")
-    print("please see output_resolution/processedARR_mpl.png")
+    if (name == ""):
+        print("please see blackwhite png in output_resolution/ directory")
+    else :
+        print(f"please see output_resolution/{name}.png")
     print("and provide the cropping locations, x1, y1, x2, and y2")
     print("\t(x1, y1) ---------------------------")
     print("\t    |         .      .      .      |")
@@ -83,7 +83,7 @@ def crop_manual(gray_array, processed_array, display = 0):
     if (display):
         crop_img_display = np.array(gray_array, copy = True)
         crop_img_display[y1:y2, x1:x2] = crop_img
-        regenerateGrayImg_mpl(crop_img_display, "cropped")
+        regenerateGrayImg_mpl(crop_img_display, name+"_cropped")
 
     return crop_img
 
@@ -118,6 +118,23 @@ def magnification_verif(aveWidth):
 ######################################################
 # # numpy pixel array approach
 ######################################################
+def manual_process(gray_array, name):
+    # image processing
+    processed_array = np.where(gray_array < binary_threshold, 0, 255)
+    regenerateGrayImg_mpl(processed_array, name+"_thres"+str(binary_threshold))
+    crop_img = crop_manual(gray_array, processed_array, name, 1)
+    # count pixels
+    aveWidth, aveHeight = count_pixel(crop_img)
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("green bar Height is", aveHeight, "mm")
+    print("green bar Width is", aveWidth, "mm")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    mag = magnification_verif(aveWidth)
+    print("magnification:", mag)
+
+
 def numpy_approach():
     # parameters
     try:  
@@ -140,7 +157,7 @@ def numpy_approach():
     aveWidth, aveHeight = count_pixel(crop_img)
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print("green bar Height is", aveWidth, "mm")
+    print("green bar Height is", aveHeight, "mm")
     print("green bar Width is", aveWidth, "mm")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -148,30 +165,51 @@ def numpy_approach():
     print("magnification:", mag)
 
 
-###################################################### 
-# # CV2 approach
-######################################################
-def cv2_approach():
-    # load the example image
-    image = cv2.imread(ccdImagePath)
-    image = cv2.resize(image, (0, 0), fx = 0.1, fy = 0.1)
+    sp_path = r"labData/2023_09_29_Image Data_FW/"
+    sp_file = r"SP_USAF1951_Gr5-Ele1_H.csv"
+    sp_file_path = sp_path + sp_file
+    sp_data = np.array(get_csv_data(sp_file_path))
+    regenerateGrayImg_mpl(sp_data, sp_file)
+    manual_process(sp_data, sp_file[:-4])
+    
 
-    # pre-process the image by resizing it, converting it to
-    # graycale, blurring it, and computing an edge map
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edged = cv2.Canny(blurred, 50, 200, 255)
 
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.adaptiveThreshold(edged, 255, 1, 1, 11, 1)
-    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    samples = np.empty((0, 100))
-    responses = []
+def generateSpImage(filePath):
+    csv_path = []
+    with open(filePath, 'r') as file:
+        reader = csv.reader(file)    
+        for row in reader:
+            csv_path.append(row[0])
 
-    window_name = 'image'
-    cv2.imshow(window_name, thresh)
-    key = cv2.waitKey(0)
+    croppedDataList = []
+    for path in csv_path:
+        pathArr = path.split("\\")
+        sp_data = np.array(get_csv_data(path))
+        crop_data = np.array(sp_data[:, 900:1150], copy=True)
+        regenerateGrayImg_mpl(crop_data, pathArr[-1][:-4])
+        croppedDataList.append(crop_data)
+
+    return croppedDataList
+
+
+def processSpImages(croppedDataList):
+    # for data in croppedDataList:
+    data = croppedDataList[0]
+    scaled_data = (data - np.min(data))/(np.max(data) - np.min(data))*255
+    print(scaled_data)
+    processed_array = np.where(scaled_data < 70, 0, 255)
+    kernel = generate_gaussian_filer(20, 5)
+    processed_matrix = gaussian_blur(processed_array, kernel)
+    regenerateGrayImg_mpl(processed_matrix, "test")
 
 
 if __name__ == "__main__":
-     numpy_approach()
+    # parameters
+    try:  
+        os.mkdir("./output_resolution") 
+    except OSError:
+        pass  
+    print("LOG: output will be stroed in ./output_resolution/") 
+    # numpy_approach()
+    croppedDataList = generateSpImage("data.csv")
+    processSpImages(croppedDataList)
