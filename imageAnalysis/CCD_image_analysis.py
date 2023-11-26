@@ -5,8 +5,7 @@ import os
 import csv
 
 
-from pixis_analysis import get_csv_data
-from curvature import *
+from curvature_analysis import *
 # #################################################################
 # parameters ######################################################
 # #################################################################
