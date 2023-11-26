@@ -3,7 +3,7 @@
 - curvature detection
   - activate venv
   - `cd imageAnalysis`
-  - `python curvature.py` (in development)
+  - `python pixis_analysis.py` (in development)
 - calberated resolution verification
   - activate venv
   - `cd imageAnalysis`
