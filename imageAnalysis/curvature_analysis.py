@@ -44,7 +44,7 @@ def crop_images(gray_img):
 
 def mpl_regenerateGrayImg(arr, name):
         plt.figure()
-        plt.imshow(arr, cmap = 'gray')
+        plt.imshow(arr, cmap = 'gray', origin='lower')
         desnPath = "./output_curvature/" + name + ".png"
         plt.savefig(desnPath)
         return desnPath
@@ -83,9 +83,12 @@ def get_csv_wavelength(filePath):
     with open(filePath, 'r') as file:
         reader = csv.reader(file)    
         for row in reader:
+            # if (row[0] == "Column"):
+            #     pixelData = row[1:].copy()
             if (row[0] == "Wavelength"):
                 waveLengthData = row[1:].copy()
-
+                break
+    # pixelData
     return list(map(float, waveLengthData))
 
 
@@ -207,6 +210,8 @@ def filter_value_bounds(imgArr):
     hist, binRange = np.histogram(imgArr.flatten(), bins = bins)
     lowerBound = np.min(imgArr)
     upperBound = np.max(imgArr)
+    print("min = ", lowerBound, "max = ", upperBound, "range = ", upperBound-lowerBound)
+
     for index, val in enumerate(hist):
         if(val < countThres): lowerBound = binRange[index+1]
         else: break
@@ -218,6 +223,8 @@ def filter_value_bounds(imgArr):
 
     if (lowerBound == np.max(imgArr) or upperBound == np.min(imgArr)):
         lowerBound, upperBound = upperBound, lowerBound
+
+    print("lowerThres = {:0.2f} UppwerThres = {:0.2f} Range = {:0.2f}".format(lowerBound, upperBound, upperBound-lowerBound))
     return upperBound, lowerBound
 
 #####################################################
