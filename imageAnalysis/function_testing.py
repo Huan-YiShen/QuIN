@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt 
 import numpy as np 
 from matplotlib.colors import LogNorm 
-from curveFitting import generate_probola
+from curveFitting import generate_parabola
 
 def test_colorbar():  
     dx, dy = 0.015, 0.05
@@ -47,7 +47,7 @@ def test_imshow():
          [16,32,64,182,256]])
     plt.imshow(arr.T, cmap ='gray', origin='lower') 
     
-    x, y = generate_probola(1, xc = 2, yc = 0, x_half_range=2)
+    x, y = generate_parabola(1, xc = 2, yc = 0, x_half_range=2)
     plt.plot(x,y)
     plt.show()
 

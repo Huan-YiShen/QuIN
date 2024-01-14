@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from curvature_analysis import *
+from curvature_analysis_helper import *
 
 # x_half_range is the total x range/2 centered at xc
 def generate_parabola(a, xc, yc, x_half_range = 10, y_lim = 9999999):
