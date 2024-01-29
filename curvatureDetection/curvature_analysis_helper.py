@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from tkinter import *
 import csv
 
 #####################################################
@@ -99,30 +100,26 @@ def store_as_csv(name, arr):
 #####################################################
 # plot image
 #####################################################
-def plot_rawData(img, wl : np.array):
-    mpl_regenerateGrayImg(img, "noCurve")
-    plt.title("curvature Detection")
-    plt.xlabel("pixels")
-    plt.ylabel("wavelength [nm]")
+def plot_rawData(img : np.ndarray, wl):
+    fig = plt.figure(dpi = 100)
+    plot1 = fig.add_subplot(111)
+
+    # mpl_regenerateGrayImg(img, "noCurve")
+    plot1.set_title("Raw Data")
+    plot1.set_xlabel("pixels")
+    plot1.set_ylabel("wavelength [nm]")
 
     upperBound, lowerBound = filter_value_bounds(img) 
-    c = plt.imshow(img, cmap ='gray', 
+    c = plot1.imshow(img, cmap ='gray', 
                    origin='lower', vmin = upperBound, vmax = lowerBound) 
-    plt.colorbar(c, label = "intensity") 
-
-    # get axies
-    print(wl)
-    ax = plt.gca()
-    
+    fig.colorbar(c, label = "intensity") 
+    # set y axies as wavelegnth
     r, c = img.shape
     interval = 500 
     wl_intervaled = [round(v, 2) for v in wl][0::interval]
-    ax.set_yticks(np.arange(0, r, interval))
-    ax.set_yticklabels(wl_intervaled)
-
-    # figure = plt.gcf()
-    # figure.set_figwidth(15)
-
+    plot1.set_yticks(np.arange(0, r, interval))
+    plot1.set_yticklabels(wl_intervaled)
+    return fig
 
 
 
@@ -232,7 +229,8 @@ def bucketFilter(curvatureArea):
     #                 break 
     # return res
 
-def filter_value_bounds(imgArr):
+def filter_value_bounds(imgArr : np.array.__class__):
+    print(imgArr)
     # bin
     bins = 10000
     countThres = 100 # if there is <countThres number of pixel, bound will change

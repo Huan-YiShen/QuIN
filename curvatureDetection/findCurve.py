@@ -4,16 +4,11 @@ import matplotlib.pyplot as plt
 from curvature_analysis_helper import *
 from parabola import *
 
-######################################
-## global parameter ##################
-######################################
-WAVELENGTH_INFO = [] # row dhat indicate the wavelength of the spectrometer
-DATA = [] # intensity value of a 2D array (transposed)
 
 ######################################
 ## preprocessing #####################
 ######################################
-def findClosestData(value, dataSet = WAVELENGTH_INFO) -> int:
+def findClosestData(value, dataSet) -> int:
     index = 0
     for ind, val in enumerate(dataSet):
         if (val <= value):
@@ -42,20 +37,22 @@ def manualCrop(waveLengthInfo : np.ndarray, intensity_matrix : np.ndarray) -> np
     crop_y2 = 400
     mask = np.ix_(np.arange(crop_y1, crop_y2), np.arange(crop_x1, crop_x2))
 
-    return intensity_matrix[mask]
+    return intensity_matrix[mask], waveLengthData_cropped
 
 
-def extractDataFromPixis(path):
+def extractDataFromPixis(path, tb_logWindow):
     intensity_matrix = np.array(get_csv_data(path))
     ver_len, hor_len = intensity_matrix.shape
     print("ver_len: ", ver_len, " | hor_len:", hor_len)
 
+    tb_logWindow.insert(END, "LOG extracting Data form file...\n")           
     waveLengthInfo = get_csv_wavelength(path)
+    print(waveLengthInfo)
 
-    # data = manualCrop(waveLengthInfo, intensity_matrix).T
+    # data, waveLengthInfo = manualCrop(waveLengthInfo, intensity_matrix)
     data = intensity_matrix.T
 
-    return (waveLengthInfo, data)
+    return waveLengthInfo, data
 
 
 def setupDir():
@@ -137,19 +134,15 @@ def findCurve(data):
 ######################################
 ## MAIN ##############################
 ######################################
-if __name__ == '__main__':
-    path = r"C:\Users\James\Documents\UWaterloo\3B_fall2023\QuIN\QuIN - GitHub\imageAnalysis\labData\2023_11_15_Image Data-new_FW\2023_11_15_Image Data-new_FW\FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
+# if __name__ == '__main__':
+#     path = r"C:\Users\James\Documents\UWaterloo\3B_fall2023\QuIN\QuIN - GitHub\imageAnalysis\labData\2023_11_15_Image Data-new_FW\2023_11_15_Image Data-new_FW\FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
 
-    setupDir()
-    # preprocessing
-    w, d = extractDataFromPixis(path)
-    WAVELENGTH_INFO = w
-    DATA = d
-    # plot_rawData(img, wavelength_axis)
-    print(DATA)
-    print(WAVELENGTH_INFO)
-    # curve detection
-    # findCurve(img)
+#     setupDir()
+#     # preprocessing
+#     w, d = extractDataFromPixis(path)
+#     # plot_rawData(img, wavelength_axis)
+#     # curve detection
+#     # findCurve(img)
 
-    # store_as_csv("curvatureArea_transposed", val)
-    print("Finished")
+#     # store_as_csv("curvatureArea_transposed", val)
+#     print("Finished")
