@@ -14,18 +14,21 @@ NavigationToolbar2Tk)
 WAVELENGTH_MAP = [] # row dhat indicate the wavelength of the spectrometer
 DATA = [] # intensity value of a 2D array (transposed)
 PATH = "" # file path
-raw_data_fig = None
 
 # layout
 row = 1
 col = 1
-colFullSpan = 5
-
+colFullSpan = 3
+canvas_width = 350
+canvas_height = 450
 window = Tk()
 tb_logWindow = Text(window, height = 5, width = 96, wrap=NONE, bg = "ivory2")
-frame_canvas = Frame(window, bg="#ababab")
+frame_canvas_raw = Frame(window, bg="black", borderwidth=2, width = canvas_width, height = canvas_height)
+frame_canvas_curve = Frame(window, bg="black",  borderwidth=2, width = canvas_width, height = canvas_height)
 
-
+######################################
+## actions ###########################
+######################################
 def action_selectFiles(textbox):
     filename = filedialog.askopenfilename(initialdir = "/",
                                           title = "Select a File",
@@ -37,11 +40,18 @@ def action_selectFiles(textbox):
     PATH = filename
 
 
-def action_importFile(textbox):
+def action_getDataAndDisplay(textbox, canvasFrame):
+    # reset frame
+    for widget in canvasFrame.winfo_children():
+        widget.destroy()
+
     inputFilePath = textbox.get("1.0", "end-1c")
     tb_logWindow.insert(END, "LOG open file: " + inputFilePath +"\n")
+    tb_logWindow.see(END)
 
     global PATH, WAVELENGTH_MAP, DATA
+
+    # extract data from the file
     try:
        w, d = extractDataFromPixis(inputFilePath, tb_logWindow)
        # from this point onward, the global variables should not be changed
@@ -51,90 +61,157 @@ def action_importFile(textbox):
        tb_logWindow.insert(END, "LOG data extraction successful...\n")   
     except FileNotFoundError:
        tb_logWindow.config(fg = "red")
-       tb_logWindow.insert(END, "ERR cannot find file \n")   
-    # try:
-    display_raw_figure()
-    # except:
-    #    tb_logWindow.config(fg = "red")
-    #    tb_logWindow.insert(END, "ERR cannot display raw data \n")   
+       tb_logWindow.insert(END, "ERR cannot find file \n")
+       return
+
+    # plot raw data
+    try:
+        tb_logWindow.insert(END, "LOG creating plot ...\n")
+        print("DATA: ", DATA)
+        print("WL: ", WAVELENGTH_MAP)
+        fig_raw = plot_rawData(np.array(DATA), np.array(WAVELENGTH_MAP))
+        tb_logWindow.insert(END, "LOG generating figure...\n")
+        fig_raw.subplots_adjust(left = -1, bottom = 0.13)
+    except:
+       tb_logWindow.config(fg = "red")
+       tb_logWindow.insert(END, "ERR cannot plot raw data \n")
+       return
+    tb_logWindow.see(END)
+
+    # update canvas frame
+    try:
+        canvas = generate_canvas(fig_raw, canvasFrame)
+        canvas.config(width = canvas_width, height = canvas_height-50)
+        canvas.pack()
+    except:
+       tb_logWindow.config(fg = "red")
+       tb_logWindow.insert(END, "ERR cannot update canvas\n")
+       return
+
+    tb_logWindow.insert(END, "LOG raw data imported successfully\n")
+    tb_logWindow.see(END)
+
+
+def action_curveDetectAndDisplay(canvasFrame):
+    # reset frame
+    for widget in canvasFrame.winfo_children():
+        widget.destroy()
+
+    tb_logWindow.insert(END, "LOG finding curvatures...\n")
+    tb_logWindow.see(END)
+
+    if len(DATA) == 0 or len(WAVELENGTH_MAP) == 0:
+        tb_logWindow.config(fg = "red")
+        tb_logWindow.insert(END, "ERR please select a raw data set first\n")
+        return
+
+    # find curve
+    try:
+        fig = findCurve(DATA, WAVELENGTH_MAP)
+        fig.subplots_adjust(left = -1, bottom = 0.13)
+    except:
+        tb_logWindow.config(fg = "red")
+        tb_logWindow.insert(END, "ERR cannot update canvas\n")
+        return
+
+    # update canvas frame
+    try:
+        canvas = generate_canvas(fig, canvasFrame)
+        canvas.config(width = canvas_width, height = canvas_height-50)
+        canvas.pack()
+    except:
+       tb_logWindow.config(fg = "red")
+       tb_logWindow.insert(END, "ERR cannot update resulting canvas\n")
+       return
+
+    tb_logWindow.insert(END, "LOG detection finished\n")
+    tb_logWindow.see(END)
+
 
 ######################################
 ## canvas ############################
 ######################################
 def generate_canvas(fig, frame):
     # creating the Tkinter canvas, containing the Matplotlib figure
-    canvas = FigureCanvasTkAgg(fig, master = window)  
+    canvas = FigureCanvasTkAgg(fig, master = frame)  
     canvas.draw()
     # creating the Matplotlib toolbar
-    toolbar = NavigationToolbar2Tk(canvas, frame, pack_toolbar=False)
+    toolbar = NavigationToolbar2Tk(canvas, frame)
     toolbar.update()
     # placing the toolbar on the Tkinter window
-
     return canvas.get_tk_widget()
     
+######################################
+## frame #############################
+######################################
+def create_selectFile_frame():
+    frame_selectFile = Frame(window, bg="#ababab")
+    label_file_explorer = Label(frame_selectFile, text = "Select you files:")
 
-def display_raw_figure():
-    global raw_data_fig
-    tb_logWindow.insert(END, "LOG creating plot ...\n")
-    print("DATA: ", DATA)
-    print("WL: ", WAVELENGTH_MAP)
-    raw_data_fig = plot_rawData(np.array(DATA), np.array(WAVELENGTH_MAP))
-    tb_logWindow.insert(END, "LOG generating figure...\n")   
-    can_rawData = generate_canvas(raw_data_fig, window) # TODO: frame_canvas
+    h=Scrollbar(frame_selectFile, orient='horizontal')
+    tb_fileSelect = Text(frame_selectFile, height = 1, width = 84,  
+                        wrap=NONE, xscrollcommand=h.set)
+    tb_fileSelect.insert(INSERT, "C:/Users/James/Documents/UWaterloo/QuIN/QuIN - GitHub/imageAnalysis/labData/2023_11_15_Image Data-new_FW/2023_11_15_Image Data-new_FW/FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv")
+    tb_fileSelect.see(END)
 
-    can_rawData.configure(highlightbackground = "red")    
-    can_rawData.grid(column = 1, row = 4, columnspan=2)
-    
+    btn_fileGet = Button(frame_selectFile,
+                            text = "≡",
+                            command = lambda: action_selectFiles(tb_fileSelect))
 
-def display_detected_figure():
-    pass
+    btn_fileSelect = Button(frame_selectFile,
+                            text = "SELECT FILE", fg = "black", bg = "lemon chiffon",
+                            command = lambda: action_getDataAndDisplay(
+                                tb_fileSelect, frame_canvas_raw))
+
+    label_file_explorer.grid(row = 1, column = 1)
+    tb_fileSelect.grid(row = 1, column = 2, columnspan=2)
+    btn_fileGet.grid(row = 1, column = 4)
+    btn_fileSelect.grid(row = 1, column = 5)
+    return frame_selectFile
+
+
+def create_display_detect_frame():
+    frame_rt = Frame(window, bg="#ababab")
+
+    btn_detect = Button(frame_rt, text = "DETECT",
+                        command = lambda: action_curveDetectAndDisplay(frame_canvas_curve))
+    btn_detect.grid(column = 1, row = 1)
+
+    return frame_rt
+
 ######################################
 ## MAIN ##############################
 ######################################
-window.title('File Explorer')
-window.geometry("900x500")
+window.title('Curvature Detection')
+window.geometry("1000x600")
 window.config(background = "white")
 
 
-# widgets
+# windows widgets
 label_title = Label(master = window, text = "curvature detection")
-label_file_explorer = Label(window, text = "Select you files:")
-
-h=Scrollbar(window, orient='horizontal')
-tb_fileSelect = Text(window, height = 1, width = 84,  
-                     wrap=NONE, xscrollcommand=h.set)
-tb_fileSelect.insert(INSERT, "C:/Users/James/Documents/UWaterloo/QuIN/QuIN - GitHub/imageAnalysis/labData/2023_11_15_Image Data-new_FW/2023_11_15_Image Data-new_FW/FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv")
-tb_fileSelect.see(END)
-
-
-btn_fileGet = Button(window,
-                        text = "≡",
-                        command = lambda: action_selectFiles(tb_fileSelect))
-
-btn_fileSelect = Button(window,
-                        text = "SELECT FILE", fg = "black", bg = "lemon chiffon",
-                        command = lambda: action_importFile(tb_fileSelect))
-
+frame_selectFile = create_selectFile_frame()
+frame_detect = create_display_detect_frame()
 
 # row 1
 label_title.grid(column = col, row = row, columnspan= colFullSpan)
 
 # row 2
-col = 1
 row += 1
-label_file_explorer.grid(column = col, row = row)
-col += 1
-tb_fileSelect.grid(column = col, row = row, columnspan=2)
-col += 2
-btn_fileGet.grid(column = col, row = row)
-col += 1
-btn_fileSelect.grid(column = col, row = row)
+col = 1
+frame_selectFile.grid(column = col, row = row, columnspan= colFullSpan)
 
 # row 3
-col = 1
 row += 1
-tb_logWindow.grid(column = col, row = row, columnspan= colFullSpan)
+col = 1
+frame_canvas_raw.grid(column = col, row = row)
+col += 1
+frame_detect.grid(column = col, row = row)
+col += 1
+frame_canvas_curve.grid(column = col, row = row)
 
 # row 4
+row += 1
+col = 1
+tb_logWindow.grid(column = col, row = row, columnspan= colFullSpan)
 
 window.mainloop()

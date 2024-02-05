@@ -27,7 +27,6 @@ def manualCrop(waveLengthInfo : np.ndarray, intensity_matrix : np.ndarray) -> np
     x_index_low = findClosestData(cropWL1, waveLengthInfo)
     x_index_high = findClosestData(cropWL2, waveLengthInfo)
     print("index_low = {}, index_high = {}".format(x_index_low, x_index_high))
-    print(type(x_index_low))
     waveLengthData_cropped = waveLengthInfo[x_index_low : x_index_high]
 
     # crop again base on pixel index
@@ -40,19 +39,23 @@ def manualCrop(waveLengthInfo : np.ndarray, intensity_matrix : np.ndarray) -> np
     return intensity_matrix[mask], waveLengthData_cropped
 
 
-def extractDataFromPixis(path, tb_logWindow):
+def extractDataFromPixis(path, tb_logWindow = None):
     intensity_matrix = np.array(get_csv_data(path))
     ver_len, hor_len = intensity_matrix.shape
     print("ver_len: ", ver_len, " | hor_len:", hor_len)
 
-    tb_logWindow.insert(END, "LOG extracting Data form file...\n")           
+    if (tb_logWindow is None):
+        print("LOG extracting Data form file...\n")
+    else:
+        tb_logWindow.insert(END, "LOG extracting Data form file...\n")
+
     waveLengthInfo = get_csv_wavelength(path)
-    print(waveLengthInfo)
 
-    # data, waveLengthInfo = manualCrop(waveLengthInfo, intensity_matrix)
-    data = intensity_matrix.T
-
-    return waveLengthInfo, data
+    intensity_matrix, waveLengthInfo = manualCrop(waveLengthInfo, intensity_matrix)
+    intensity_matrix = intensity_matrix.T
+    print("waveLengthInfo", len(waveLengthInfo))
+    print("data", intensity_matrix.shape)
+    return waveLengthInfo, intensity_matrix
 
 
 def setupDir():
@@ -80,7 +83,24 @@ def verifyCurve(data:np.ndarray, x:int, y:int, thres:int):
     return validPixelCount
 
 
-def findCurve(data):
+def findCurve(data, wl):
+    # create a base line figure
+    fig = plt.figure(dpi = 100)
+    resultPlt = fig.add_subplot(111)
+    resultPlt.set_title("Curve Detected")
+    resultPlt.set_xlabel("pixels")
+    resultPlt.set_ylabel("wavelength [nm]")
+    upperBound, lowerBound = filter_value_bounds(data) 
+    c = resultPlt.imshow(data, cmap ='gray', 
+                   origin='lower', vmin = upperBound, vmax = lowerBound) 
+    fig.colorbar(c, label = "intensity")
+    r, c = data.shape
+    interval = 500 
+    wl_intervaled = [round(v, 2) for v in wl][0::interval]
+    resultPlt.set_yticks(np.arange(0, r, interval))
+    resultPlt.set_yticklabels(wl_intervaled)
+
+
     valid_curves = []
     # TODO: determine a intensity threshold where a pixel is deemed "bright" 
     thres = 1000
@@ -105,7 +125,7 @@ def findCurve(data):
         # check if the curve fits
         doPlot = 0
         validPixelCount = verifyCurve(data, x, y, thres)
-        print("verify {} {} {:0.2f}".format(cx, cy, validPixelCount/hor_len))
+        # print("verify {} {} {:0.2f}".format(cx, cy, validPixelCount/hor_len)) # DEBUG
         if (validPixelCount > 0.9*hor_len): 
             doPlot = 1
         elif (validPixelCount > 0.7*hor_len): 
@@ -113,7 +133,7 @@ def findCurve(data):
             for stretch in stretchRange:    # using a fixed stretchRange for now
                 x, y = generate_parabola(stretch, cx, cy, x_half_range=cx, y_lim=y_lim)
                 validPixelCount = verifyCurve(data, x, y, thres)
-                print("verify after 0.7 {} {} {:0.2f} {:0.2f}".format(cx, cy, validPixelCount/hor_len, stretch))
+                # print("verify after 0.7 {} {} {:0.2f} {:0.2f}".format(cx, cy, validPixelCount/hor_len, stretch)) # DEBUG
                 if (validPixelCount > 0.9*hor_len): 
                     a = stretch
                     doPlot = 1
@@ -121,28 +141,30 @@ def findCurve(data):
 
         if (doPlot):
             valid_curves.append((a, cy, cx))
-            print("valid_curve: y_center", cy)
-            plt.plot(x, y)
+            # print("valid_curve: y_center", cy)  # DEBUG
+            resultPlt.plot(x, y)
             # plt.pause(0.005)
          
-    plt.ylim(0, ver_len)
-    desnPath = "./output_curvature/" + "final" + ".png"
-    plt.savefig(desnPath)
-    plt.show()
-    print(valid_curves)
+    resultPlt.set_ylim(0, ver_len)
+    desnPath = "./output_img/" + "final" + ".png"
+    fig.savefig(desnPath)
+    # plt.show()
+    # print(valid_curves)
+
+    return fig
 
 ######################################
 ## MAIN ##############################
 ######################################
-# if __name__ == '__main__':
-#     path = r"C:\Users\James\Documents\UWaterloo\3B_fall2023\QuIN\QuIN - GitHub\imageAnalysis\labData\2023_11_15_Image Data-new_FW\2023_11_15_Image Data-new_FW\FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
+if __name__ == '__main__':
+    path = r"C:\Users\James\Documents\UWaterloo\QuIN\QuIN - GitHub\imageAnalysis\labData\2023_11_15_Image Data-new_FW\2023_11_15_Image Data-new_FW\FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
 
-#     setupDir()
-#     # preprocessing
-#     w, d = extractDataFromPixis(path)
-#     # plot_rawData(img, wavelength_axis)
-#     # curve detection
-#     # findCurve(img)
+    setupDir()
+    # preprocessing
+    w, d = extractDataFromPixis(path)
+    plot_rawData(d, w)
+    # curve detection
+    findCurve(d, w)
 
-#     # store_as_csv("curvatureArea_transposed", val)
-#     print("Finished")
+    # store_as_csv("curvatureArea_transposed", val)
+    print("Finished")
