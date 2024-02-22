@@ -27,6 +27,8 @@ def getCurvatureSample(path):
     ver_len, hor_len = intensity_matrix.shape
     print("ver_len: ", ver_len, " | hor_len:", hor_len)
 
+    waveLengthData = get_csv_wavelength(path)
+
     # crop the image to where curvature should have been 11800, 12400
     ####### old data ########
     # crop_x1 = 11500
@@ -39,22 +41,26 @@ def getCurvatureSample(path):
     #F58 - 1163~1300 wavelength
     cropWL1 = 1200
     cropWL2 = 1300
-    waveLengthData = get_csv_wavelength(path)
-    x_index_low = findClosestData(cropWL1, waveLengthData)
-    x_index_high = findClosestData(cropWL2, waveLengthData)
-    print("index_low = {}, index_high = {}".format(x_index_low, x_index_high))
-    print(type(x_index_low))
-    crop_x1 = x_index_low
-    crop_x2 = x_index_high
+
+    ######## full WL ########
+    # x_index_low = findClosestData(cropWL1, waveLengthData)
+    # x_index_high = findClosestData(cropWL2, waveLengthData)
+    # print("index_low = {}, index_high = {}".format(x_index_low, x_index_high))
+    crop_x1 = 0
+    crop_x2 = len(intensity_matrix[0])
     crop_y1 = 150
     crop_y2 = 400
-    waveLengthData_cropped = waveLengthData[x_index_low : x_index_high]
+    # waveLengthData = waveLengthData[x_index_low : x_index_high]
 
     mask = np.ix_(np.arange(crop_y1, crop_y2), np.arange(crop_x1, crop_x2))
     # transport data 
     i_curvatureArea = intensity_matrix[mask].T
+    print("uncropped data", intensity_matrix.shape)
+    # print("waveLengthInfo", len(waveLengthData_cropped))
+    print("data", i_curvatureArea.shape)
 
-    return i_curvatureArea, waveLengthData_cropped
+    return i_curvatureArea, waveLengthData
+    # return intensity_matrix.T, waveLengthData
 
 
 '''
@@ -173,7 +179,7 @@ def plot_rawData(img, wl : np.array):
 
 
 if __name__ == '__main__':
-    path = r"C:\Users\James\Documents\UWaterloo\3B_fall2023\QuIN\QuIN - GitHub\imageAnalysis\labData\2023_11_15_Image Data-new_FW\2023_11_15_Image Data-new_FW\FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
+    path = r"C:/Users/James/Documents/UWaterloo/QuIN/QuIN - GitHub/imageAnalysis/labData/2023_11_15_Image Data-new_FW/2023_11_15_Image Data-new_FW/FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
     img, wavelength_axis = getCurvatureSample(path)
     plot_rawData(img, wavelength_axis)
     findCurve(img)

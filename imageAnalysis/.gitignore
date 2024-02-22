@@ -2,3 +2,6 @@
 /output_curvature/
 /output_resolution/
 /labData/
+/__pycache__/
+*.csv
+*.log

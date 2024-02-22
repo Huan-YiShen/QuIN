@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 from tkinter import *
 import csv
 
+######################################
+## CONSTS ############################
+######################################
+
+CONVERTION_PATH = r'pixel_to_k.csv'
+
 #####################################################
 # image processing
 #####################################################
@@ -97,11 +103,47 @@ def store_as_csv(name, arr):
     np.savetxt("output_curvature/" + name + ".csv", arr, delimiter=",")
 
 
+def write_detection_result(valid_curves):
+    conv_data = read_conversion_data(CONVERTION_PATH)
+    with open('./output_log/detectionResults.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['vertial stretch', 'center-y [nm]', 'center-x [pixels]', 'center-x [k-bar]'])
+        for entry in valid_curves:
+            row = [entry[0], entry[1], entry[2]]
+            row.append(conv_data[entry[2]][1])
+            writer.writerow(row)
+
+
+# each entry:
+# [0] = Pixel, [1] = θ1 (°), [2] = K||(m-1)
+def read_conversion_data(filePath, list_layout = 0):
+    # TODO: make this conversion data global
+    if list_layout == 1:
+        entry_list = []
+        with open(filePath, 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                entry_list.append([float(i) for i in row])
+        return entry_list
+
+    pixel_map = {}
+    with open(filePath, 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            pixel_map[int(row[0])] = (float(row[1]), float(row[2]))
+
+    return pixel_map
+
+
+def conver_pixel2kbar(pixel, conversion_data):
+    return conversion_data[pixel]
+
+
 #####################################################
 # plot image
 #####################################################
-def plot_rawData(img : np.ndarray, wl):
-    fig = plt.figure(dpi = 100)
+def plot_rawData(fig, img : np.ndarray, wl):
+    # fig = plt.figure(dpi = 100)
     plot1 = fig.add_subplot(111)
 
     # mpl_regenerateGrayImg(img, "noCurve")
@@ -119,6 +161,19 @@ def plot_rawData(img : np.ndarray, wl):
     wl_intervaled = [round(v, 2) for v in wl][0::interval]
     plot1.set_yticks(np.arange(0, r, interval))
     plot1.set_yticklabels(wl_intervaled)
+
+    # y_size, x_size = img.shape
+    # y_interval = 200
+    # wl_intervaled = [round(v, 2) for v in wl][0::y_interval]
+    # plot1.set_yticks(np.arange(0, y_size, y_interval))
+    # plot1.set_yticklabels(wl_intervaled)
+
+    # set x axis to k_bar
+    # y_interval = 500
+
+    # read_conversion_data(CONVERTION_PATH)
+    # plot1.set_xticks(np.arange(0, x_size, x_size))
+
     return fig
 
 
