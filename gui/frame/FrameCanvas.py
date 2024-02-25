@@ -33,8 +33,10 @@ class FrameCanvas(tk.Frame):
         # creating the Tkinter canvas, containing the Matplotlib figure
         canvas = FigureCanvasTkAgg(self.fig, master = self)  
         canvas.draw()
-        # creating the Matplotlib toolbar
-        toolbar = NavigationToolbar2Tk(canvas, self)
-        toolbar.update()
-        # placing the toolbar on the Tkinter window
+
+        # # creating the Matplotlib toolbar
+        # toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=True)
+        # toolbar.update()
+        # # placing the toolbar on the Tkinter window
+
         return canvas.get_tk_widget()

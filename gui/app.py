@@ -33,19 +33,6 @@ class App(tk.Tk):
         # self.logMsg = tk.StringVar()  # TODO: change tb_logWindow to use StringVar
 
 
-    def variable_hook(self):
-        self.path.trace_add(
-            "write", self.action_importData)
-
-
-    def action_importData(self, *args):
-        path = self.path.get()
-        self.data = get_csv_data(path)
-        self.wavelength_map = get_csv_wavelength(path)
-        self.f_imgFull.update(path, self.data, self.wavelength_map)
-        self.f_imgCrop.update(path, self.data, self.wavelength_map)
-
-
     def initialize_wigets(self):
         self.label_title = tk.Label(
             master = self, bg="light gray", height = 1,
@@ -74,6 +61,17 @@ class App(tk.Tk):
         self.label_footnote.grid(column = 0, row = 3, columnspan = 2, sticky="ews")
 
 
+    def variable_hook(self):
+        self.path.trace_add(
+            "write", self.action_importData)
+
+
+    def action_importData(self, *args):
+        path = self.path.get()
+        self.data = get_csv_data(path)
+        self.wavelength_map = get_csv_wavelength(path)
+        self.f_imgFull.update(path, self.data, self.wavelength_map)
+        self.f_imgCrop.update(self.data, self.wavelength_map)
 
         
 
