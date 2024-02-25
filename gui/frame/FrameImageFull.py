@@ -40,7 +40,8 @@ class FrameImageFull(tk.Frame):
         self.wlRange.set(f"{round(self.wl[0], 2)} ~ {round(self.wl[-1], 2)}")
         self.intensityMax.set(np.amax(data))
         self.intensityMin.set(np.amin(data))
-        #debug
+
+        #debug log
         print(f'''LOG data extracted:
               self.fileName = {self.fileName}
               self.pixelRange = {self.pixelRange}
@@ -49,15 +50,15 @@ class FrameImageFull(tk.Frame):
               self.intensityMin = {self.intensityMin}''')
 
         # plot data
-        # try:
-        print("LOG generating figure...\n")
-        plot_rawData(self.fig, np.array(self.data), np.array(self.wl))
-        self.f_plot.updateCanvas()
-        # self.fig.subplots_adjust(left = -1, bottom = 0.13)
-        # plt.show() #################################################### DEBUG
-        # except:
-        #     print("ERR cannot plot raw data \n")
-        #     return
+        try:
+            print("LOG generating figure...\n")
+            plot_rawData(self.fig, np.array(self.data), np.array(self.wl))
+            self.f_plot.updateCanvas()
+            # self.fig.subplots_adjust(left = -1, bottom = 0.13)
+            # plt.show() #################################################### DEBUG
+        except:
+            print("ERR cannot plot raw data \n")
+            return
 
 
     def create_widgets(self):
