@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
-from matplotlib import axes
 import numpy as np
 
-def plot_rawData(fig, data, wl):
+def plot_cropData():
+    pass
+
+def plot_rawData(fig : plt.figure.__class__, data, wl):
+        fig.clear()
         plot = fig.add_subplot(111)
 
         # mpl_regenerateGrayImg(img, "noCurve")
@@ -14,7 +17,7 @@ def plot_rawData(fig, data, wl):
         #             origin='lower', vmin = upperBound, vmax = lowerBound) 
         c = plot.imshow(data, cmap ='gray') 
 
-        fig.colorbar(c, label = "intensity", location ='top', fraction=0.13)
+        fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
         # set y axies as wavelegnth
         _, colCount = data.shape
@@ -24,7 +27,7 @@ def plot_rawData(fig, data, wl):
         plot.set_xticklabels(wl_intervaled)
         plot.set_aspect("auto")
 
-
+# data processing
 def filter_value_bounds(imgArr : np.array.__class__):
     print(imgArr)
     # bin
@@ -50,3 +53,15 @@ def filter_value_bounds(imgArr : np.array.__class__):
 
     print("lowerThres = {:0.2f} UppwerThres = {:0.2f} Range = {:0.2f}".format(lowerBound, upperBound, upperBound-lowerBound))
     return upperBound, lowerBound
+
+
+def findClosestData(value, dataSet) -> int:
+    index = 0
+    for ind, val in enumerate(dataSet):
+        if (val < value):
+            continue
+        else:
+            index = ind
+            break
+
+    return index
