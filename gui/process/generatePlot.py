@@ -66,10 +66,19 @@ def plot_rawData(fig : plt.figure.__class__, data, wl):
 
 def bound_intensity_value(
         imgArr : np.array.__class__, range : tuple):
+    newArr = []
     for pixel in imgArr:
+        newPixelVals = []
         for val in pixel:
-            if (val < range[0]): val = range[0]
-            elif(val > range[1]): val = range[1]
+            if (val < range[0]): 
+                newPixelVals.append(range[0])
+            elif(val > range[1]):
+                newPixelVals.append(range[1])
+            else:
+                newPixelVals.append(val)
+        newArr.append(newPixelVals)
+    
+    return newArr
 
 
 def findClosestData(value, dataSet) -> int:

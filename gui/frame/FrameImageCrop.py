@@ -74,16 +74,20 @@ class FrameImageCrop(tk.Frame):
         wl_index_max = findClosestData(cwMax, self.raw_wl)
         mask = np.ix_(np.arange(cpMin, cpMax), np.arange(lw_index_min, wl_index_max))
         # crop intensity - set upper and lower bounds
-        croppedFig = bound_intensity_value(np.array(self.raw_data)[mask], (ciMin, ciMax))
+
+        croppedFig = bound_intensity_value(
+            np.array(self.raw_data)[mask], (ciMin, ciMax))
 
         print(f'''FramgeImageCrop.crop():
               cpMin = {cpMin}
               cpMax = {cpMax}
               lw_index_min = {lw_index_min}
-              wl_index_max = {wl_index_max}''')
+              wl_index_max = {wl_index_max}
+              ciMin = {ciMin}
+              ciMax = {ciMax}''')
 
         self.setCropped(
-            data = np.array(np.array(self.raw_data)[mask]),
+            data = np.array(croppedFig),
             wl = np.array(self.raw_wl[lw_index_min : wl_index_max]),
             startingPx = (cpMin, cpMax),
             intensityRange = (ciMin, ciMax)
