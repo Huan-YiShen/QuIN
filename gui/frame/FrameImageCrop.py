@@ -19,10 +19,13 @@ class FrameImageCrop(tk.Frame):
         self.raw_wl = wl
         self.crop_data = []
         self.crop_wl = []
+        self.crop_pixelStart = (0, 0)             # could store only starting pixel so we can get the ending via crop_data row count
+        self.crop_intensityRange = (0, 0)
+
         # input internal variables
         self.cropPixelRange = tk.StringVar(value = "[min, max]")
         self.cropWlRange = tk.StringVar(value = "[min, max]")
-        self.cropIntensityRange = tk.StringVar(value = "[min, max]")
+        self.cropIntensityRange = tk.StringVar(value = "do not modify until top two are set")
         self.fig = plt.figure(dpi = 100)
         self.create_widgets()
         self.place_widgets()
@@ -33,9 +36,11 @@ class FrameImageCrop(tk.Frame):
         self.raw_wl = wl
 
 
-    def setCropped(self, data, wl):
+    def setCropped(self, data, wl, startingPx, intensityRange):
         self.crop_data = data
         self.crop_wl = wl
+        self.crop_pixelStart = startingPx
+        self.crop_intensityRange = intensityRange
 
 
     def crop(self):
@@ -67,23 +72,29 @@ class FrameImageCrop(tk.Frame):
         # crop pixel and wl
         lw_index_min = findClosestData(cwMin, self.raw_wl)
         wl_index_max = findClosestData(cwMax, self.raw_wl)
-        
         mask = np.ix_(np.arange(cpMin, cpMax), np.arange(lw_index_min, wl_index_max))
-        print(cwMax)
-        print(self.raw_wl)
-        print(cpMin, cpMax, lw_index_min, wl_index_max)
-        print("===")
-        print(mask)
+        # crop intensity - set upper and lower bounds
+        croppedFig = bound_intensity_value(np.array(self.raw_data)[mask], (ciMin, ciMax))
+
+        print(f'''FramgeImageCrop.crop():
+              cpMin = {cpMin}
+              cpMax = {cpMax}
+              lw_index_min = {lw_index_min}
+              wl_index_max = {wl_index_max}''')
+
         self.setCropped(
             data = np.array(np.array(self.raw_data)[mask]),
-            wl = np.array(self.raw_wl[lw_index_min : wl_index_max]))
+            wl = np.array(self.raw_wl[lw_index_min : wl_index_max]),
+            startingPx = (cpMin, cpMax),
+            intensityRange = (ciMin, ciMax)
+            )
 
-        # crop intensity - set upper and lower bounds
 
         # plot data
         # try:
         print("LOG generating cropped figure...\n")
-        plot_rawData(self.fig, self.crop_data, self.crop_wl)
+        plot_cropData(self.fig, self.crop_data, 
+                      self.crop_wl, self.crop_pixelStart)
         self.f_plot.updateCanvas()
         # self.fig.subplots_adjust(left = -1, bottom = 0.13)
         # plt.show() #################################################### DEBUG

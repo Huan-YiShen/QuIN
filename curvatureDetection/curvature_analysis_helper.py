@@ -284,6 +284,7 @@ def bucketFilter(curvatureArea):
     #                 break 
     # return res
 
+# filter values into discrete bins dynamically (using it's own min and max)
 def filter_value_bounds(imgArr : np.array.__class__):
     print(imgArr)
     # bin

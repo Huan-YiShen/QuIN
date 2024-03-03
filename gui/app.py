@@ -8,7 +8,7 @@ from process.processCSV import *
 
 class App(tk.Tk):
     def __init__(self, 
-                 title = "Curvature Detection v2",
+                 title = "Curvature Detection",
                  size = (1024, 640)):
         # main setup
         super().__init__() # initiailze tk.Tk()
@@ -39,7 +39,7 @@ class App(tk.Tk):
             text = "Curvature Detection")
         self.label_footnote = tk.Label(
             master = self, bg="light gray", height = 1, anchor = "w", 
-            text = "© QuIN Lab, 2024 Huan Yi Shen v0.0")
+            text = "© QuIN Lab, 2024 Huan Yi Shen v0.1")
 
         self.f_fileSelect = FrameFileSelection(self, self.path)
         self.f_imgFull = FrameImageFull(self)

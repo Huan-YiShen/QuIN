@@ -1,14 +1,37 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_cropData():
-    pass
+def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
+    fig.clear()
+    plot = fig.add_subplot(111)
+
+    plot.set_ylabel("pixels")
+    plot.set_xlabel("wavelength [nm]")
+    c = plot.imshow(data, cmap ='gray') 
+
+    fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
+
+    rowCount, colCount = data.shape
+    # set y axies as cropped wavelegnth
+    wl_interval = 2000 
+    wl_vals = [round(v, 2) for v in wl][0::wl_interval]
+    plot.set_xticks(np.arange(0, colCount, wl_interval))
+    plot.set_xticklabels(wl_vals)
+
+    # set x axies (pixel) start range
+    pixel_range = np.arange(startingPx[0], startingPx[1])
+    pixel_interval = int((startingPx[1] - startingPx[0])/6)
+    pixel_vals = pixel_range[0::pixel_interval]
+    plot.set_yticks(np.arange(0, rowCount, pixel_interval))
+    plot.set_yticklabels(pixel_vals)
+
+    plot.set_aspect("auto")
+
 
 def plot_rawData(fig : plt.figure.__class__, data, wl):
         fig.clear()
         plot = fig.add_subplot(111)
 
-        # mpl_regenerateGrayImg(img, "noCurve")
         plot.set_ylabel("pixels")
         plot.set_xlabel("wavelength [nm]")
 
@@ -19,40 +42,34 @@ def plot_rawData(fig : plt.figure.__class__, data, wl):
 
         fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
+        rowCount, colCount = data.shape
         # set y axies as wavelegnth
-        _, colCount = data.shape
         interval = 2000 
         wl_intervaled = [round(v, 2) for v in wl][0::interval]
         plot.set_xticks(np.arange(0, colCount, interval))
         plot.set_xticklabels(wl_intervaled)
+
+        # set x axies (pixel) start range
+        num_x_tics = 6
+        pixel_range = np.arange(0, rowCount)
+        pixel_interval = int((rowCount)/num_x_tics)
+        pixel_vals = [round(v, 2) for v in pixel_range][0::pixel_interval]
+
+        plot.set_yticks(np.arange(0, rowCount, pixel_interval))
+        plot.set_yticklabels(pixel_vals)
+
         plot.set_aspect("auto")
 
+
 # data processing
-def filter_value_bounds(imgArr : np.array.__class__):
-    print(imgArr)
-    # bin
-    bins = 10000
-    countThres = 100 # if there is <countThres number of pixel, bound will change
-    
-    hist, binRange = np.histogram(imgArr.flatten(), bins = bins)
-    lowerBound = np.min(imgArr)
-    upperBound = np.max(imgArr)
-    print("min = ", lowerBound, "max = ", upperBound, "range = ", upperBound-lowerBound)
+# filter image to have the desired intensity range
 
-    for index, val in enumerate(hist):
-        if(val < countThres): lowerBound = binRange[index+1]
-        else: break
-    ind = bins
-    for val in hist[::-1]:
-        if (val < countThres): upperBound = binRange[ind]
-        else: break
-        ind -= 1
-
-    if (lowerBound == np.max(imgArr) or upperBound == np.min(imgArr)):
-        lowerBound, upperBound = upperBound, lowerBound
-
-    print("lowerThres = {:0.2f} UppwerThres = {:0.2f} Range = {:0.2f}".format(lowerBound, upperBound, upperBound-lowerBound))
-    return upperBound, lowerBound
+def bound_intensity_value(
+        imgArr : np.array.__class__, range : tuple):
+    for pixel in imgArr:
+        for val in pixel:
+            if (val < range[0]): val = range[0]
+            elif(val > range[1]): val = range[1]
 
 
 def findClosestData(value, dataSet) -> int:

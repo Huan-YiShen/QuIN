@@ -54,15 +54,15 @@ def extractDataFromPixis(path, tb_logWindow = None):
     waveLengthInfo = get_csv_wavelength(path)
 
     # for DEMO
-    # intensity_matrix, waveLengthInfo = manualCrop(waveLengthInfo, intensity_matrix)
+    intensity_matrix, waveLengthInfo = manualCrop(waveLengthInfo, intensity_matrix) ############################## TODO: do it in GUI
     # for DEMO
     crop_x1 = 0
     crop_x2 = len(intensity_matrix[0])
     crop_y1 = 150
     crop_y2 = 400
-    mask = np.ix_(np.arange(crop_y1, crop_y2), np.arange(crop_x1, crop_x2))
+    # mask = np.ix_(np.arange(crop_y1, crop_y2), np.arange(crop_x1, crop_x2))
 
-    intensity_matrix = intensity_matrix[mask].T
+    intensity_matrix = intensity_matrix.T
     print("waveLengthInfo", len(waveLengthInfo))
     print("data", intensity_matrix.shape)
 
