@@ -1,10 +1,8 @@
 import tkinter as tk
-from frame.FrameFileSelection import FrameFileSelection
-from frame.FrameImageFull import FrameImageFull
-from frame.FrameImageCrop import FrameImageCrop
-
+import frame as fm
 from process.processCSV import *
 
+footNote = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
 
 class App(tk.Tk):
     def __init__(self, 
@@ -39,11 +37,12 @@ class App(tk.Tk):
             text = "Curvature Detection")
         self.label_footnote = tk.Label(
             master = self, bg="light gray", height = 1, anchor = "w", 
-            text = "© QuIN Lab, 2024 Huan Yi Shen v0.1")
 
-        self.f_fileSelect = FrameFileSelection(self, self.path)
-        self.f_imgFull = FrameImageFull(self)
-        self.f_imgCrop = FrameImageCrop(self)
+            text = footNote)
+
+        self.f_fileSelect = fm.FrameFileSelection(self, self.path)
+        self.f_imgFull = fm.FrameImageFull(self)
+        self.f_imgCrop = fm.FrameImageCrop(self)
 
 
     def widget_placement(self):
