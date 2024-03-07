@@ -37,7 +37,6 @@ class App(tk.Tk):
             text = "Curvature Detection")
         self.label_footnote = tk.Label(
             master = self, bg="light gray", height = 1, anchor = "w", 
-
             text = footNote)
 
         self.f_fileSelect = fm.FrameFileSelection(self, self.path)

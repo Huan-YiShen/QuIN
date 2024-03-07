@@ -13,10 +13,14 @@ def path_leaf(path):
 class FrameImageFull(tk.Frame):
     def __init__(self, parent, path = "", data = [], wl = []):
         super().__init__(parent)
+        # initialize variables
+
+        # data variables (initial data)
         self.filePath = path
         self.data = data
         self.wl = wl
 
+        # display variables
         self.fileName = tk.StringVar()
         self.pixelRange = tk.StringVar()
         self.wlRange = tk.StringVar()
@@ -24,10 +28,19 @@ class FrameImageFull(tk.Frame):
         self.intensityMin = tk.StringVar()
         self.fig = plt.figure(dpi = 100)
 
-        # label = tk.Label(self, bg="yellow")
-        # label.pack(expand=True, fill = "both")
+        # widget variables
         self.create_widgets()
         self.place_widgets()
+
+
+    def create_widgets(self):
+        # title label widget
+        self.lb_title = tk.Label(self, text = "Import Full Image")
+        # parameter frame widget
+        self.f_stat = tk.Frame(self)
+        self.generate_parameter_frame()
+        # canvas frame widget
+        self.f_plot = FrameCanvas(self, self.fig)
 
 
     def update(self, path, data, wl):
@@ -38,8 +51,17 @@ class FrameImageFull(tk.Frame):
         self.fileName.set(path_leaf(path))
         self.pixelRange.set(f"0 ~ {len(data)}")
         self.wlRange.set(f"{round(self.wl[0], 2)} ~ {round(self.wl[-1], 2)}")
-        self.intensityMax.set(np.amax(data))
-        self.intensityMin.set(np.amin(data))
+        
+        maxIntensity = np.amax(data)
+        minIntensity = np.amin(data)
+        self.intensityMax.set(maxIntensity)
+        self.intensityMin.set(minIntensity)
+
+        # Intensity Data: enable edit and bind to update_graph_intensity
+        self._en_intensityMax.configure(state="normal")
+        self._en_intensityMin.configure(state="normal")
+        self._en_intensityMax.bind('<Return>', self._update_graph_intensity)
+        self._en_intensityMin.bind('<Return>', self._update_graph_intensity)
 
         #debug log
         print(f'''LOG data extracted:
@@ -52,23 +74,36 @@ class FrameImageFull(tk.Frame):
         # plot data
         try:
             print("LOG generating figure...\n")
-            plot_rawData(self.fig, np.array(self.data), np.array(self.wl))
+            plot_rawData(
+                self.fig, np.array(self.data), np.array(self.wl), 
+                float(maxIntensity), float(minIntensity))
             self.f_plot.updateCanvas()
-            # self.fig.subplots_adjust(left = -1, bottom = 0.13)
-            # plt.show() #################################################### DEBUG
+            # plt.show() #################################################### for DEBUG
         except:
             print("ERR cannot plot raw data \n")
             return
 
 
-    def create_widgets(self):
-        self.lb_title = tk.Label(self, text = "Import Full Image")
-
-        self.f_stat = tk.Frame(self)
-        self.generate_parameter_frame()
-
-        self.f_plot = FrameCanvas(self, self.fig)
+    def _update_graph_intensity(self, *args):
+        print(f'''update intensity:
+            self.intensityMax = {self.intensityMax}
+            self.intensityMin = {self.intensityMin}''')
+        # replot
+        try:
+            print("LOG generating figure...\n")
+            plot_rawData(
+                self.fig, np.array(self.data), np.array(self.wl), 
+                float(self.intensityMax.get()), float(self.intensityMin.get()))
+            self.f_plot.updateCanvas()
+            # plt.show() #################################################### DEBUG
+        except:
+            print("ERR cannot plot raw data \n")
+            return
         
+
+    def get_intensity_data(self):
+        return(self.intensityMin, self.intensityMin)
+
 
     def place_widgets(self):
         self.rowconfigure(2, weight=1)
@@ -88,8 +123,8 @@ class FrameImageFull(tk.Frame):
         en_fileName = tk.Entry(self.f_stat, textvariable=self.fileName, state= "readonly")
         en_pixelRange = tk.Entry(self.f_stat, textvariable=self.pixelRange, state= "readonly")
         en_wlRange = tk.Entry(self.f_stat, textvariable=self.wlRange, state= "readonly")
-        en_intensityMax = tk.Entry(self.f_stat, textvariable=self.intensityMax, state= "readonly")
-        en_intensityMin = tk.Entry(self.f_stat, textvariable=self.intensityMin, state= "readonly")
+        self._en_intensityMax = tk.Entry(self.f_stat, textvariable=self.intensityMax, state= "readonly")
+        self._en_intensityMin = tk.Entry(self.f_stat, textvariable=self.intensityMin, state= "readonly")
 
         #### layout #### 
         self.f_stat.columnconfigure(1, weight=1)
@@ -103,5 +138,5 @@ class FrameImageFull(tk.Frame):
         en_fileName.grid(row = 0, column= 1, sticky="we")
         en_pixelRange.grid(row = 1, column= 1, sticky="we")
         en_wlRange.grid(row = 2, column= 1, sticky="we")
-        en_intensityMax.grid(row = 3, column= 1, sticky="we")
-        en_intensityMin.grid(row = 4, column= 1, sticky="we")
+        self._en_intensityMax.grid(row = 3, column= 1, sticky="we")
+        self._en_intensityMin.grid(row = 4, column= 1, sticky="we")

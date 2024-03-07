@@ -7,7 +7,7 @@ def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
 
     plot.set_ylabel("pixels")
     plot.set_xlabel("wavelength [nm]")
-    c = plot.imshow(data, cmap ='gray') 
+    c = plot.imshow(data, cmap ='jet') 
 
     fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
@@ -28,7 +28,7 @@ def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
     plot.set_aspect("auto")
 
 
-def plot_rawData(fig : plt.figure.__class__, data, wl):
+def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
         fig.clear()
         plot = fig.add_subplot(111)
 
@@ -38,7 +38,7 @@ def plot_rawData(fig : plt.figure.__class__, data, wl):
         # upperBound, lowerBound = filter_value_bounds(data) 
         # c = plot.imshow(data, cmap ='gray', 
         #             origin='lower', vmin = upperBound, vmax = lowerBound) 
-        c = plot.imshow(data, cmap ='gray') 
+        c = plot.imshow(data, cmap ='jet', vmax = vmax, vmin = vmin) 
 
         fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
