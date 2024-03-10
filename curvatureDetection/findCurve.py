@@ -132,10 +132,30 @@ def findCurve(fig, data, wl):
     x_range = 40
     cx_range = np.arange(x_center-x_range, x_center+x_range, pixel_resolution)
     cy_range = np.arange(0, ver_len, pixel_resolution)
-    # TODO: determine a range of verital stretch we want to explore
+  
+    # TODO: automatically set initial stretch
     a = -0.15
     stretchRange = np.arange(-1, 0, 0.005)
 
+    # TODO: determine 3 threshold threshold
+    # vi_threshold = valid intensity threshold
+    #       where a pixel is deemed "bright"
+    # mm_threshold = minimual matched threshold
+    #       minimual amount of pixels matches the graph for the curve to be considered potentially present (move on for further analysis)
+    # vc_threshold = valid curve threshold
+    #       amount of pixel matched where the curve is deemed to be present
+    vi_threshold = 1000             
+    mm_threshold = 0.7*hor_len
+    vc_threshold = 0.9*hor_len
+
+    '''
+     1. for each height of the parabola
+     2.     generate a cruve
+     3.     check if primilary curve fits (use vi_theshold)
+     4.     if pass mm_threshold 
+     5.         vary "a" parameter (vertical stretch) to see if 
+     6.     if vc_threshold fix 
+    '''
     ###############################
     ########## detection ##########
     ###############################
