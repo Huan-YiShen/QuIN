@@ -52,7 +52,7 @@ def crop_images(gray_img):
 def mpl_regenerateGrayImg(arr, name):
         plt.figure()
         plt.imshow(arr, cmap = 'gray', origin='lower')
-        desnPath = "./output_curvature/" + name + ".png"
+        desnPath = "./output_img/" + name + ".png"
         plt.savefig(desnPath)
         return desnPath
 
@@ -100,7 +100,7 @@ def get_csv_wavelength(filePath):
 
 
 def store_as_csv(name, arr):
-    np.savetxt("output_curvature/" + name + ".csv", arr, delimiter=",")
+    np.savetxt("output_img/" + name + ".csv", arr, delimiter=",")
 
 
 def write_detection_result(valid_curves):

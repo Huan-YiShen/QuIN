@@ -65,6 +65,7 @@ def extractDataFromPixis(path, tb_logWindow = None):
     intensity_matrix = intensity_matrix.T
     print("waveLengthInfo", len(waveLengthInfo))
     print("data", intensity_matrix.shape)
+    # cropped = intensity_matrix
 
     return waveLengthInfo, intensity_matrix
 
@@ -85,7 +86,7 @@ def setupDir():
 ######################################
 ## curve detection ###################
 ######################################
-def verifyCurve(data:np.ndarray, x:int, y:int, thres:int):
+def verifyCurve(data:np.ndarray, x:np.ndarray, y:np.ndarray, thres:int):
     validPixelCount = 0
     for ind, col in enumerate(x):
         row = y[ind]
@@ -95,6 +96,20 @@ def verifyCurve(data:np.ndarray, x:int, y:int, thres:int):
             validPixelCount += 1
 
     return validPixelCount
+
+
+def varyVerticalStretch(stretchRange, cx, cy, y_lim, hor_len, vi_threshold):
+    doPlot = 0
+    validStretch = 0
+    for stretch in stretchRange:    # using a fixed stretchRange for now
+        x, y = generate_parabola(stretch, cx, cy, x_half_range=cx, y_lim=y_lim)
+        validPixelCount = verifyCurve(data, x, y, vi_threshold)
+        print("verify after 0.7 {} {} {:0.2f} {:0.2f}".format(cx, cy, validPixelCount/hor_len, stretch))
+        if (validPixelCount > 0.9*hor_len): 
+            validStretch = stretch
+            doPlot = 1
+            break
+    return doPlot, validStretch
 
 
 def findCurve(fig, data, wl):
@@ -167,20 +182,35 @@ def findCurve(fig, data, wl):
             x, y = generate_parabola(a, cx, cy, x_half_range=cx, y_lim=y_lim)
             # check if the curve fits
             doPlot = 0
-            validPixelCount = verifyCurve(data, x, y, thres)
+            validPixelCount = verifyCurve(data, x, y, vi_threshold)
             # print("verify {} {} {:0.2f}".format(cx, cy, validPixelCount/hor_len)) # DEBUG
-            if (validPixelCount > 0.9*hor_len): 
+            # if (validPixelCount > 0.9*hor_len): 
+            #     doPlot = 1
+            # elif (validPixelCount > 0.7*hor_len): 
+            #     # if we hit 60%, change the a value to see if we can do better
+            #     for stretch in stretchRange:    # using a fixed stretchRange for now
+            #         x, y = generate_parabola(stretch, cx, cy, x_half_range=cx, y_lim=y_lim)
+            #         validPixelCount = verifyCurve(data, x, y, thres)
+            #         # print("verify after 0.7 {} {} {:0.2f} {:0.2f}".format(cx, cy, validPixelCount/hor_len, stretch)) # DEBUG
+            #         if (validPixelCount > 0.9*hor_len): 
+            #             a = stretch
+            #             doPlot = 1
+            #             break
+            if (validPixelCount > vc_threshold): 
+                # the curve is valid
                 doPlot = 1
-            elif (validPixelCount > 0.7*hor_len): 
-                # if we hit 60%, change the a value to see if we can do better
-                for stretch in stretchRange:    # using a fixed stretchRange for now
-                    x, y = generate_parabola(stretch, cx, cy, x_half_range=cx, y_lim=y_lim)
-                    validPixelCount = verifyCurve(data, x, y, thres)
-                    # print("verify after 0.7 {} {} {:0.2f} {:0.2f}".format(cx, cy, validPixelCount/hor_len, stretch)) # DEBUG
-                    if (validPixelCount > 0.9*hor_len): 
-                        a = stretch
-                        doPlot = 1
-                        break
+            elif (validPixelCount > mm_threshold):
+                # if count hits the minimal threshold, change the a value to see if we can do better
+                doPlot, newStretch = varyVerticalStretch(
+                    stretchRange, cx, cy, y_lim, hor_len, vi_threshold)
+                if (doPlot): a = newStretch
+
+            if (doPlot):
+                valid_curves.append((a, cy, cx))
+                print("valid_curve: y_center", cy)
+                plt.plot(x, y)
+                plt.pause(0.0005)
+
 
             if (doPlot):
                 valid_curves.append((a, cy, cx))
@@ -199,7 +229,7 @@ def findCurve(fig, data, wl):
 ## MAIN ##############################
 ######################################
 if __name__ == '__main__':
-    path = r"C:\Users\James\Documents\UWaterloo\QuIN\QuIN - GitHub\imageAnalysis\labData\2023_11_15_Image Data-new_FW\2023_11_15_Image Data-new_FW\FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
+    path = r"../data/FS-57_C-wave_575nm_30mW_900-1400nm_Slit100_full_Trans_1sec_2D.csv"
 
     setupDir()
     # preprocessing
