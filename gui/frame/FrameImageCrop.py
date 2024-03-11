@@ -113,8 +113,7 @@ class FrameImageCrop(tk.Frame):
         if (len(pixAllNums) == 2): cpMin, cpMax = pixAllNums[:2]
 
         wlAllNums = [float(s) for s in re.findall(r'\d+', self.displayWlRange.get())]
-        if (len(wlAllNums) == 2): 
-            cwMin, cwMax = wlAllNums[:2]
+        if (len(wlAllNums) == 2): cwMin, cwMax = wlAllNums[:2]
 
         itAllNums = [int(s) for s in re.findall(r'\d+', self.displayIntensityRange.get())]
         if (len(itAllNums) == 2): ciMin, ciMax = itAllNums[:2]
@@ -127,7 +126,15 @@ class FrameImageCrop(tk.Frame):
         self.crop_wl = wl
         self.crop_pixels = startingPx
         self.crop_intensity = intensityRange
-        
+
+
+    def analyze(self):
+        '''
+        initialize a new analysis window 
+        '''
+        pass
+
+
 
     def place_widgets(self):
         self.rowconfigure(2, weight=1)
@@ -147,6 +154,8 @@ class FrameImageCrop(tk.Frame):
         en_cIntensityRange = tk.Entry(frame, textvariable=self.displayIntensityRange)
         
         btn_crop = tk.Button(frame, text = "Crop", command=self.crop)
+        btn_analysis = tk.Button(frame, text = "Analysis", command=self.analyze)
+
         #### layout #### 
         frame.columnconfigure(1, weight=1)
 

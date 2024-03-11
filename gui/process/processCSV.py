@@ -86,3 +86,7 @@ def read_conversion_data(filePath, list_layout = 0):
 
 def conver_pixel2kbar(pixel, conversion_data):
     return conversion_data[pixel]
+
+
+def save_csv(data : list, name : str):
+    pass

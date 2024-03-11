@@ -41,3 +41,4 @@ to run the GUI:
 ## Maintainer note
 - when adding new requirements to the venv, be sure to record it in the requirements.txt `$ pip freeze > requirements.txt`
 - once a proejct or GUI is finished, use [pyinstaller](https://pyinstaller.org/en/stable/) or equvalent library to bundle it into a executable 
+- for Liunx system, install tkinter before running GUI `sudo apt install python3-tk` 
