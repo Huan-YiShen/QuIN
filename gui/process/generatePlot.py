@@ -3,11 +3,11 @@ import numpy as np
 
 def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
     fig.clear()
-    plot = fig.add_subplot(111)
+    ax = fig.add_subplot(111)
 
-    plot.set_ylabel("pixels")
-    plot.set_xlabel("wavelength [nm]")
-    c = plot.imshow(data, cmap ='jet') 
+    ax.set_ylabel("pixels")
+    ax.set_xlabel("wavelength [nm]")
+    c = ax.imshow(data, cmap ='jet') 
 
     fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
@@ -15,30 +15,30 @@ def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
     # set y axies as cropped wavelegnth
     wl_interval = 2000 
     wl_vals = [round(v, 2) for v in wl][0::wl_interval]
-    plot.set_xticks(np.arange(0, colCount, wl_interval))
-    plot.set_xticklabels(wl_vals)
+    ax.set_xticks(np.arange(0, colCount, wl_interval))
+    ax.set_xticklabels(wl_vals)
 
     # set x axies (pixel) start range
     pixel_range = np.arange(startingPx[0], startingPx[1])
     pixel_interval = int((startingPx[1] - startingPx[0])/6)
     pixel_vals = pixel_range[0::pixel_interval]
-    plot.set_yticks(np.arange(0, rowCount, pixel_interval))
-    plot.set_yticklabels(pixel_vals)
+    ax.set_yticks(np.arange(0, rowCount, pixel_interval))
+    ax.set_yticklabels(pixel_vals)
 
-    plot.set_aspect("auto")
+    ax.set_aspect("auto")
 
 
 def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
         fig.clear()
-        plot = fig.add_subplot(111)
+        ax = fig.add_subplot(111)
 
-        plot.set_ylabel("pixels")
-        plot.set_xlabel("wavelength [nm]")
+        ax.set_ylabel("pixels")
+        ax.set_xlabel("wavelength [nm]")
 
         # upperBound, lowerBound = filter_value_bounds(data) 
-        # c = plot.imshow(data, cmap ='gray', 
+        # c = ax.imshow(data, cmap ='gray', 
         #             origin='lower', vmin = upperBound, vmax = lowerBound) 
-        c = plot.imshow(data, cmap ='jet', vmax = vmax, vmin = vmin) 
+        c = ax.imshow(data, cmap ='jet', vmax = vmax, vmin = vmin) 
 
         fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
@@ -46,8 +46,8 @@ def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
         # set y axies as wavelegnth
         interval = 2000 
         wl_intervaled = [round(v, 2) for v in wl][0::interval]
-        plot.set_xticks(np.arange(0, colCount, interval))
-        plot.set_xticklabels(wl_intervaled)
+        ax.set_xticks(np.arange(0, colCount, interval))
+        ax.set_xticklabels(wl_intervaled)
 
         # set x axies (pixel) start range
         num_x_tics = 6
@@ -55,10 +55,10 @@ def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
         pixel_interval = int((rowCount)/num_x_tics)
         pixel_vals = [round(v, 2) for v in pixel_range][0::pixel_interval]
 
-        plot.set_yticks(np.arange(0, rowCount, pixel_interval))
-        plot.set_yticklabels(pixel_vals)
+        ax.set_yticks(np.arange(0, rowCount, pixel_interval))
+        ax.set_yticklabels(pixel_vals)
 
-        plot.set_aspect("auto")
+        ax.set_aspect("auto")
 
 
 # data processing

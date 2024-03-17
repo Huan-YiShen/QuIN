@@ -79,8 +79,8 @@ class FrameImageFull(tk.Frame):
                 float(maxIntensity), float(minIntensity))
             self.f_plot.updateCanvas()
             # plt.show() #################################################### for DEBUG
-        except:
-            print("ERR cannot plot raw data \n")
+        except Exception as e:
+            print(f"ERR cannot plot raw data \n\t {e}")
             return
 
 
@@ -96,8 +96,8 @@ class FrameImageFull(tk.Frame):
                 float(self.intensityMax.get()), float(self.intensityMin.get()))
             self.f_plot.updateCanvas()
             # plt.show() #################################################### DEBUG
-        except:
-            print("ERR cannot plot raw data \n")
+        except Exception as e:
+            print("ERR cannot plot raw data \n\t {e}")
             return
         
 

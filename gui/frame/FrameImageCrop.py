@@ -99,8 +99,8 @@ class FrameImageCrop(tk.Frame):
                         self.crop_wl, self.crop_pixels)
             self.f_plot.updateCanvas()
             ## plt.show() #################################################### for DEBUG
-        except:
-            print("ERR cannot plot cropped data \n")
+        except Exception as e:
+            print(f"ERR cannot plot cropped data \n\t {e}")
             return
 
 
