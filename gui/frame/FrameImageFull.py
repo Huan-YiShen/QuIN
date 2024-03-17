@@ -73,7 +73,7 @@ class FrameImageFull(tk.Frame):
 
         # plot data
         try:
-            print("LOG generating figure...\n")
+            print("LOG generating full figure...\n")
             plot_rawData(
                 self.fig, np.array(self.data), np.array(self.wl), 
                 float(maxIntensity), float(minIntensity))
@@ -90,7 +90,7 @@ class FrameImageFull(tk.Frame):
             self.intensityMin = {self.intensityMin}''')
         # replot
         try:
-            print("LOG generating figure...\n")
+            print("LOG generating figure...")
             plot_rawData(
                 self.fig, np.array(self.data), np.array(self.wl), 
                 float(self.intensityMax.get()), float(self.intensityMin.get()))

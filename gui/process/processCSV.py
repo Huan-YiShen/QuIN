@@ -34,7 +34,7 @@ def get_csv_data(filePath : str):
     for row in file_data:
         matrix_data.append(np.array(row, dtype = int))
 
-    print(f"Finish retrieving data from csv \n{filePath}...\n")
+    print(f"Finish retrieving data from csv \n{filePath}\n")
     return matrix_data
 
 
