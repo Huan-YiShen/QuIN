@@ -3,23 +3,25 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 class FrameCanvas(tk.Frame):
-    def __init__(self, parent, figure, size = (300, 400)):
+    def __init__(self, parent, figure, size = (300, 400), toolBar = False):
         super().__init__(
             parent, bg = "black", borderwidth = 2, 
             width = size[0], height = size[1])
 
         self.fig = figure
         self.size = size
+        self.toolBar = toolBar
 
 
     def updateCanvas(self):
-        print("LOG display generation...\n")
+        print("LOG generating canvas ...")
 
         # reset frame
         for widget in self.winfo_children():
             widget.destroy()
-        # update canvas frame
-        print(self.fig)
+
+
+        print("\t", self.fig)
         # try:
         canvas = self.generate_canvas()
         canvas.config(width = self.size[0], height = self.size[1])
@@ -34,9 +36,10 @@ class FrameCanvas(tk.Frame):
         canvas = FigureCanvasTkAgg(self.fig, master = self)  
         canvas.draw()
 
-        # # creating the Matplotlib toolbar
-        # toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=True)
-        # toolbar.update()
-        # # placing the toolbar on the Tkinter window
+        # creating the Matplotlib toolbar
+        if self.toolBar:
+            toolbar = NavigationToolbar2Tk(canvas, self, pack_toolbar=True)
+            toolbar.update()
+        # placing the toolbar on the Tkinter window
 
         return canvas.get_tk_widget()

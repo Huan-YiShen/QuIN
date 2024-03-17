@@ -1,6 +1,28 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+'''
+plot curve fit data generated in curvatureDetection.curveFit()
+'''
+def plot_curveFit(fig : plt.figure.__class__, 
+             max_index : list, max_eV : list):
+    
+    fig.clear()
+    plot = fig.add_subplot(111)
+
+    plot.plot(max_index, max_eV)
+    plot.set_xlabel('Pixel')
+    plot.set_ylabel('Energy (eV)')
+
+    fit_ylim_ini = 1.05
+    fit_ylim_las = 1.2
+
+    plot.set_ylim(fit_ylim_ini,fit_ylim_las)
+    return fig
+
+'''
+plot 2D raw data but cropped
+'''
 def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
     fig.clear()
     ax = fig.add_subplot(111)
@@ -28,6 +50,9 @@ def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
     ax.set_aspect("auto")
 
 
+'''
+plot 2D raw data imported from csv file
+'''
 def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
         fig.clear()
         ax = fig.add_subplot(111)
@@ -63,7 +88,6 @@ def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
 
 # data processing
 # filter image to have the desired intensity range
-
 def bound_intensity_value(
         imgArr : np.array.__class__, range : tuple):
     newArr = []

@@ -5,6 +5,7 @@ import re
 import matplotlib.pyplot as plt
 
 from frame.FrameCanvas import FrameCanvas
+from frame.WindowAnalysis import WindowAnalysis
 from process.generatePlot import findClosestData
 from process.generatePlot import bound_intensity_value
 from process.generatePlot import plot_cropData
@@ -15,7 +16,9 @@ def path_leaf(path):
     return tail or ntpath.basename(head)
 
 class FrameImageCrop(tk.Frame):
-    def __init__(self, parent, data = [], wl = []):
+    def __init__(self, parent, 
+                 data : np.array.__class__ = np.array([0]), 
+                 wl : np.array.__class__ = np.array([0])):
         super().__init__(parent)
         # initialize variables
         # data variables (initial data)
@@ -28,11 +31,13 @@ class FrameImageCrop(tk.Frame):
         self.displayIntensityRange = tk.StringVar(value = "[min, max] do not modify until top two are set")
 
         # state variables (storing post processing)
-        self.crop_data = []
-        self.crop_wl = []
-        self.crop_pixels = (0, 0)             # could store only starting pixel so we can get the ending via crop_data row count
-        self.crop_intensity = (0, 0)
+        self.crop_data = data
+        self.crop_wl = wl
+        self.crop_pixels = (0, len(data))   # could store only starting pixel so we can get the ending via crop_data row count
+        self.crop_intensity = (np.amin(data), np.amax(data))
         self.fig = plt.figure(dpi = 100)
+
+        self.analysis = None
 
         # widget variables
         self.create_widgets()
@@ -52,6 +57,12 @@ class FrameImageCrop(tk.Frame):
     def update(self, data, wl):
         self.raw_data = data
         self.raw_wl = wl
+
+        self.crop_data = data
+        self.crop_wl = wl
+        self.crop_pixels = (0, len(data))
+        self.crop_intensity = (np.amin(data), np.amax(data))
+
 
 
     def set_displayIntensity(self, intensityMinMax : tuple):
@@ -94,7 +105,7 @@ class FrameImageCrop(tk.Frame):
 
         # plot data
         try:
-            print("LOG generating cropped figure...\n")
+            print("LOG generating cropped figure...")
             plot_cropData(self.fig, self.crop_data, 
                         self.crop_wl, self.crop_pixels)
             self.f_plot.updateCanvas()
@@ -132,7 +143,7 @@ class FrameImageCrop(tk.Frame):
         '''
         initialize a new analysis window 
         '''
-        pass
+        self.analysis = WindowAnalysis(self.crop_data, self.crop_wl, self.crop_pixels, self.crop_intensity)
 
 
 
@@ -168,3 +179,4 @@ class FrameImageCrop(tk.Frame):
         en_cIntensityRange.grid(row = 2, column= 1, sticky="we")
 
         btn_crop.grid(row = 3, column= 0, padx=20, pady=8, sticky="w")
+        btn_analysis.grid(row = 3, column= 1, padx=20, pady=8, sticky="s")

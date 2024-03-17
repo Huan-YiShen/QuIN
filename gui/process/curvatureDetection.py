@@ -1,15 +1,9 @@
 import numpy as np
 from scipy.optimize import curve_fit
 
-
-###--- Function
-
-def lorentzian(x, x0, A, FWHM):
-    return (A / np.pi) * (FWHM / 2) / ((x - x0) ** 2 + (FWHM / 2) ** 2)
-
-def gaussian(x, x0, A, sigma):
-    return A*np.exp(-(x-x0)**2/(2*sigma**2))
-
+from process.constants import h
+from process.constants import c
+from process.constants import lorentzian
 
 ### --- analysis
 def curveFit(data, wl):
@@ -27,23 +21,11 @@ def curveFit(data, wl):
         
         initial_guess = [(wl[0]+wl[-1])/2,1,1]
     
-        popt1, pcov1 = curve_fit(lorentzian, x1_range, y1_range, p0=initial_guess1)
+        popt1, pcov1 = curve_fit(lorentzian, x_range, y_range, p0=initial_guess)
         
-        max_index.append(i)
+        max_index.append(ind)
         max_wl.append(popt1[0])
         max_eV.append(h*c/(popt1[0]*1e-9))
         
-        print(popt1[0], '_', h*c/(popt1[0]*1e-9))
-
-
-def plot_fit():
-    plt.plot(max_index, max_eV)
-    plt.xlabel('Pixel')
-    plt.ylabel('Energy (eV)')
-
-
-    fit_ylim_ini = 1.05
-    fit_ylim_las = 1.2
-
-
-    plt.ylim(fit_ylim_ini,fit_ylim_las)
+        # print(popt1[0], '_', h*c/(popt1[0]*1e-9))
+    return max_index, max_wl, max_eV
