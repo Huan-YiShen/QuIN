@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from process.constants import square
 '''
 plot curve fit data generated in curvatureDetection.curveFit()
 '''
@@ -8,17 +9,27 @@ def plot_curveFit(fig : plt.figure.__class__,
              max_index : list, max_eV : list):
     
     fig.clear()
-    plot = fig.add_subplot(111)
+    ax = fig.add_subplot(111)
 
-    plot.plot(max_index, max_eV)
-    plot.set_xlabel('Pixel')
-    plot.set_ylabel('Energy (eV)')
+    ax.plot(max_index, max_eV)
+    ax.set_xlabel('Pixel')
+    ax.set_ylabel('Energy (eV)')
 
     fit_ylim_ini = 1.05
     fit_ylim_las = 1.2
 
-    plot.set_ylim(fit_ylim_ini,fit_ylim_las)
+    ax.set_ylim(fit_ylim_ini,fit_ylim_las)
     return fig
+
+
+def plot_parabola_overlay(fig, max_index, max_eV, popt):
+    fig.clear()
+    ax = fig.add_subplot(111)
+
+    ax.plot(max_index, max_eV)
+    ax.plot(max_index, square(max_index, popt[0],popt[1],popt[2]))
+    ax.set_xlabel('Pixel')
+    ax.set_ylabel('Energy (eV)')
 
 '''
 plot 2D raw data but cropped

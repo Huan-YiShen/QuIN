@@ -14,3 +14,16 @@ def lorentzian(x, x0, A, FWHM):
 
 def gaussian(x, x0, A, sigma):
     return A*np.exp(-(x-x0)**2/(2*sigma**2))
+
+def square(x, a, b, c):
+    return a*(x - b)**2 + c
+
+###--- helpers
+def to_eV( wl : np.array.__class__):
+    wl_meter = (wl)*1e-9
+    return h*c/(wl_meter)
+
+
+def to_wl_nm(eV : np.array.__class__):
+    wl_nm = (eV)*1e9
+    return h*c/wl_nm

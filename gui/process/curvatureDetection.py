@@ -4,6 +4,8 @@ from scipy.optimize import curve_fit
 from process.constants import h
 from process.constants import c
 from process.constants import lorentzian
+from process.constants import square
+from process.constants import to_wl_nm
 
 ### --- analysis
 def curveFit(data, wl):
@@ -29,3 +31,14 @@ def curveFit(data, wl):
         
         # print(popt1[0], '_', h*c/(popt1[0]*1e-9))
     return max_index, max_wl, max_eV
+
+
+def find_parabola(cropped_index, cropped_eV):
+    quad_a = 1
+    quad_b = 145
+    quad_c = 1
+
+    initial_guess = [quad_a, quad_b, quad_c]
+    popt, _ = curve_fit(square, cropped_index, cropped_eV, p0=initial_guess)
+    print('center: ', popt[1], 'and' ,  round(popt[1],0), ' / center lambda: ', to_wl_nm(popt[2]))
+    return popt
