@@ -13,27 +13,30 @@ class FrameCanvas(tk.Frame):
         self.toolBar = toolBar
 
 
-    def updateCanvas(self):
+
+    def updateCanvas(self, figure = None):
         print("LOG generating canvas ...")
+        
+        if figure is None:
+            figure = self.fig
 
         # reset frame
         for widget in self.winfo_children():
             widget.destroy()
 
+        print("\t", figure)
+        try:
+            canvas = self.generate_canvas(figure)
+            canvas.config(width = self.size[0], height = self.size[1])
+            canvas.pack(fill="both", expand=True)
+        except Exception as e:
+            print("ERR cannot update canvas")
+            print(e)
 
-        print("\t", self.fig)
-        # try:
-        canvas = self.generate_canvas()
-        canvas.config(width = self.size[0], height = self.size[1])
-        canvas.pack(fill="both", expand=True)
-        # except:
-        #     self.tb_logWindow.config(fg = "red")
-        #     self.tb_logWindow.insert(END, "ERR cannot update canvas\n")
 
-
-    def generate_canvas(self):
+    def generate_canvas(self, figure):
         # creating the Tkinter canvas, containing the Matplotlib figure
-        canvas = FigureCanvasTkAgg(self.fig, master = self)  
+        canvas = FigureCanvasTkAgg(figure, master = self)  
         canvas.draw()
 
         # creating the Matplotlib toolbar

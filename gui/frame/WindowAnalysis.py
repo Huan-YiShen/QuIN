@@ -5,10 +5,16 @@ import numpy as np
 
 from frame.FrameParabolaDetect import FrameParabolaDetect
 
+
+TITLE = "Curvature Detection"
+FOOT_NOTE = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
+
+
 '''
 Analysis window
 '''
 class WindowAnalysis():
+
     def __init__(
         self, data : np.array.__class__ = np.array([]), 
         wl : np.array.__class__ = np.array([]), 
@@ -23,8 +29,9 @@ class WindowAnalysis():
         self.win = tk.Toplevel()
 
         self.win.title("Analysis")
-        self.win.geometry('1200x600')
-        
+        self.win.geometry('1800x1200')
+        self.win.title(TITLE)
+
         self.data = data
         self.wl = wl
         self.pixelRange = pixelRange
@@ -47,6 +54,10 @@ class WindowAnalysis():
 
 
     def generate_widgets(self):
+        self.label_footnote = tk.Label(
+            master = self.win, bg="light gray", height = 1, anchor = "w", 
+            text = FOOT_NOTE)
+
         self.f_curvefit = FrameParabolaDetect(
             self.win, self.data, self.wl, self.pixelRange[0])
         self.f_control = self.generate_controlFrame()
@@ -56,3 +67,4 @@ class WindowAnalysis():
         ttk.Label(self.win, text = "A label").pack()
         ttk.Button(self.win, text = "EXIT", command = self.close_win).pack()
         self.f_curvefit.pack()
+        self.label_footnote.pack()

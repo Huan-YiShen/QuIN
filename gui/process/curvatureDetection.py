@@ -8,7 +8,7 @@ from process.constants import square
 from process.constants import to_wl_nm
 
 ### --- analysis
-def curveFit(data, wl):
+def peak_curve(data, wl):
     max_index = []
     max_wl = []
     max_eV = []

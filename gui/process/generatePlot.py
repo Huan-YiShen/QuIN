@@ -5,7 +5,7 @@ from process.constants import square
 '''
 plot curve fit data generated in curvatureDetection.curveFit()
 '''
-def plot_curveFit(fig : plt.figure.__class__, 
+def plot_peak_curve(fig : plt.figure.__class__, 
              max_index : list, max_eV : list):
     
     fig.clear()
@@ -22,14 +22,15 @@ def plot_curveFit(fig : plt.figure.__class__,
     return fig
 
 
-def plot_parabola_overlay(fig, max_index, max_eV, popt):
+def plot_parabola_overlay(fig, max_index, max_eV, parabola):
     fig.clear()
     ax = fig.add_subplot(111)
 
     ax.plot(max_index, max_eV)
-    ax.plot(max_index, square(max_index, popt[0],popt[1],popt[2]))
+    ax.plot(max_index, parabola)
     ax.set_xlabel('Pixel')
     ax.set_ylabel('Energy (eV)')
+
 
 '''
 plot 2D raw data but cropped

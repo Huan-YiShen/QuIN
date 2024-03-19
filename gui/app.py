@@ -71,7 +71,7 @@ class App(tk.Tk):
         self.f_imgFull.update(path, self.data, self.wavelength_map)
         self.f_imgCrop.update(self.data, self.wavelength_map)
 
-        
+
 
 
 if __name__ == '__main__':
