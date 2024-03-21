@@ -22,14 +22,16 @@ def plot_peak_curve(fig : plt.figure.__class__,
     return fig
 
 
-def plot_parabola_overlay(fig, max_index, max_eV, parabola):
+def plot_parabola_overlay(fig, base_x, base_y, parabola_x, parabola, x_label = "Pixel"):
     fig.clear()
     ax = fig.add_subplot(111)
 
-    ax.plot(max_index, max_eV)
-    ax.plot(max_index, parabola)
-    ax.set_xlabel('Pixel')
+    ax.plot(base_x, base_y)
+    ax.plot(parabola_x, parabola)
+    ax.set_xlabel(x_label)
     ax.set_ylabel('Energy (eV)')
+
+    fig.subplots_adjust(top = 0.95, bottom = 0.15)
 
 
 '''
@@ -66,36 +68,36 @@ def plot_cropData(fig : plt.figure.__class__, data, wl, startingPx):
 plot 2D raw data imported from csv file
 '''
 def plot_rawData(fig : plt.figure.__class__, data, wl, vmax, vmin):
-        fig.clear()
-        ax = fig.add_subplot(111)
+    fig.clear()
+    ax = fig.add_subplot(111)
 
-        ax.set_ylabel("pixels")
-        ax.set_xlabel("wavelength [nm]")
+    ax.set_ylabel("pixels")
+    ax.set_xlabel("wavelength [nm]")
 
-        # upperBound, lowerBound = filter_value_bounds(data) 
-        # c = ax.imshow(data, cmap ='gray', 
-        #             origin='lower', vmin = upperBound, vmax = lowerBound) 
-        c = ax.imshow(data, cmap ='jet', vmax = vmax, vmin = vmin) 
+    # upperBound, lowerBound = filter_value_bounds(data) 
+    # c = ax.imshow(data, cmap ='gray', 
+    #             origin='lower', vmin = upperBound, vmax = lowerBound) 
+    c = ax.imshow(data, cmap ='jet', vmax = vmax, vmin = vmin) 
 
-        fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
+    fig.colorbar(c, label = "intensity", orientation ='horizontal', fraction=0.13)
 
-        rowCount, colCount = data.shape
-        # set y axies as wavelegnth
-        interval = 2000 
-        wl_intervaled = [round(v, 2) for v in wl][0::interval]
-        ax.set_xticks(np.arange(0, colCount, interval))
-        ax.set_xticklabels(wl_intervaled)
+    rowCount, colCount = data.shape
+    # set y axies as wavelegnth
+    interval = 2000 
+    wl_intervaled = [round(v, 2) for v in wl][0::interval]
+    ax.set_xticks(np.arange(0, colCount, interval))
+    ax.set_xticklabels(wl_intervaled)
 
-        # set x axies (pixel) start range
-        num_x_tics = 6
-        pixel_range = np.arange(0, rowCount)
-        pixel_interval = int((rowCount)/num_x_tics)
-        pixel_vals = [round(v, 2) for v in pixel_range][0::pixel_interval]
+    # set x axies (pixel) start range
+    num_x_tics = 6
+    pixel_range = np.arange(0, rowCount)
+    pixel_interval = int((rowCount)/num_x_tics)
+    pixel_vals = [round(v, 2) for v in pixel_range][0::pixel_interval]
 
-        ax.set_yticks(np.arange(0, rowCount, pixel_interval))
-        ax.set_yticklabels(pixel_vals)
-
-        ax.set_aspect("auto")
+    ax.set_yticks(np.arange(0, rowCount, pixel_interval))
+    ax.set_yticklabels(pixel_vals)
+    
+    ax.set_aspect("auto")
 
 
 # data processing

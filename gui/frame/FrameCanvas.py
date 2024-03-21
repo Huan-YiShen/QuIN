@@ -27,7 +27,7 @@ class FrameCanvas(tk.Frame):
         print("\t", figure)
         try:
             canvas = self.generate_canvas(figure)
-            canvas.config(width = self.size[0], height = self.size[1])
+            canvas.config(width = self.size[0], height = self.size[1] + 10)
             canvas.pack(fill="both", expand=True)
         except Exception as e:
             print("ERR cannot update canvas")
@@ -36,7 +36,7 @@ class FrameCanvas(tk.Frame):
 
     def generate_canvas(self, figure):
         # creating the Tkinter canvas, containing the Matplotlib figure
-        canvas = FigureCanvasTkAgg(figure, master = self)  
+        canvas = FigureCanvasTkAgg(figure, master = self)
         canvas.draw()
 
         # creating the Matplotlib toolbar

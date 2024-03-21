@@ -4,7 +4,7 @@ from tkinter import ttk
 import numpy as np
 
 from frame.FrameParabolaDetect import FrameParabolaDetect
-
+from frame.FrameParabolaDisplay import FrameParabolaDisplay
 
 TITLE = "Curvature Detection"
 FOOT_NOTE = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
@@ -50,7 +50,38 @@ class WindowAnalysis():
         contain methods like save image, etc
     '''
     def generate_controlFrame(self):
-        pass
+        f_control = ttk.Frame(self.win)
+
+        f_title = ttk.Frame(f_control)
+        lb_title = ttk.Label(f_title, text = "Analysis Control")
+        btn_exit = ttk.Button(f_title, text = "EXIT", command = self.close_win)
+        lb_title.grid(row = 0, column = 0, sticky = "w")
+        btn_exit.grid(row = 0, column = 1, sticky = "e")
+
+        lb_select = ttk.Label(f_control, text = "Analysis Control")
+        
+        # objective lens selection
+        objectiveLensSelection = tk.IntVar()
+        f_objectiveLens = ttk.Frame(f_control)
+        rb_NA085 = ttk.Radiobutton(f_objectiveLens, text="NA0.85", variable=objectiveLensSelection, value=0)
+        rb_NA042 = ttk.Radiobutton(f_objectiveLens, text="NA0.42", variable=objectiveLensSelection, value=1)
+        rb_NA085.grid(row = 0, column = 0, sticky = "w")
+        rb_NA042.grid(row = 0, column = 1, sticky = "w")
+
+        # input focus of lenses
+        inputFocus = tk.IntVar()
+        f_inputFocus = ttk.Frame(f_control)
+        rb_1 = ttk.Radiobutton(f_inputFocus, text="150mm", variable=inputFocus, value=0)
+        rb_2 = ttk.Radiobutton(f_inputFocus, text="100mm", variable=inputFocus, value=1)
+        rb_1.grid(row = 0, column = 0, sticky = "w")
+        rb_2.grid(row = 0, column = 1, sticky = "w")
+
+
+        f_title.grid(row = 0, column = 0)
+        lb_select.grid(row = 1, column = 0)
+        f_objectiveLens.grid(row = 2, column = 0)
+        f_inputFocus.grid(row = 3, column = 0)
+        return f_control
 
 
     def generate_widgets(self):
@@ -58,13 +89,14 @@ class WindowAnalysis():
             master = self.win, bg="light gray", height = 1, anchor = "w", 
             text = FOOT_NOTE)
 
-        self.f_curvefit = FrameParabolaDetect(
-            self.win, self.data, self.wl, self.pixelRange[0])
+        self.f_paraDisplay = FrameParabolaDisplay(self.win)
+        self.f_paraDetect = FrameParabolaDetect(
+            self.win, self.data, self.wl, self.pixelRange[0], self.f_paraDisplay)
         self.f_control = self.generate_controlFrame()
 
 
     def place_widgets(self):
-        ttk.Label(self.win, text = "A label").pack()
-        ttk.Button(self.win, text = "EXIT", command = self.close_win).pack()
-        self.f_curvefit.pack()
-        self.label_footnote.pack()
+        self.f_control.grid(row = 0, column = 0, sticky="nw")
+        self.f_paraDetect.grid(row = 1, column = 0, sticky="w")
+        self.f_paraDisplay.grid(row = 0, column = 1, rowspan= 2, sticky="ns")
+        # self.label_footnote.pack(row = 3, column = 0, columnspan = 2, sticky="ews")
