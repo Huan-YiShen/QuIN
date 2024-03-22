@@ -89,8 +89,10 @@ class FrameParabolaDetect(tk.Frame):
 
 
     def _update_plot(self, *arg):
-        self.crop_index = self.max_index[self.pixelMin.get() : self.pixelMax.get()]
-        self.crop_eV = self.max_eV[self.pixelMin.get() : self.pixelMax.get()]
+        minOffseted = self.pixelMin.get()-self.initPixelVal
+        maxOffseted = self.pixelMax.get()-self.initPixelVal
+        self.crop_index = self.max_index[minOffseted : maxOffseted]
+        self.crop_eV = self.max_eV[minOffseted : maxOffseted]
 
         popt = find_parabola(self.crop_index, self.crop_eV)
         self.parabola = square(self.crop_index, popt[0],popt[1],popt[2])

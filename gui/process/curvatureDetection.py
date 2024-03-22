@@ -35,10 +35,11 @@ def peak_curve(data, wl):
 
 def find_parabola(cropped_index, cropped_eV):
     quad_a = 1
-    quad_b = 145
+    quad_b = cropped_index[int(len(cropped_index)/2)]
     quad_c = 1
 
     initial_guess = [quad_a, quad_b, quad_c]
+    print("initial_guess", initial_guess)
     popt, _ = curve_fit(square, cropped_index, cropped_eV, p0=initial_guess)
     print('center: ', popt[1], 'and' ,  round(popt[1],0), ' / center lambda: ', to_wl_nm(popt[2]))
     return popt
