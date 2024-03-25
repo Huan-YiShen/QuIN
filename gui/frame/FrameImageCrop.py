@@ -49,7 +49,7 @@ class FrameImageCrop(tk.Frame):
         self.lb_title = tk.Label(self, text = "Crop Image")
         # parameter frame widget
         self.f_para = tk.Frame(self)
-        self.generate_parameter_frame(self.f_para)
+        self._generate_parameter_frame(self.f_para)
         # canvas frame widget
         self.f_plot = FrameCanvas(self, self.fig)
 
@@ -155,7 +155,7 @@ class FrameImageCrop(tk.Frame):
         self.f_plot.grid(row = 2, column = 0, sticky="news")
 
 
-    def generate_parameter_frame(self, frame):
+    def _generate_parameter_frame(self, frame):
         lb_cPixelRange = tk.Label(frame, text = "Crop Pixel Range")
         lb_cWlRange = tk.Label(frame, text = "Crop λ Range")
         lb_cIntensityRange = tk.Label(frame, text = "Crop Intensity Range")

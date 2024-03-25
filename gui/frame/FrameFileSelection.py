@@ -17,11 +17,10 @@ class FrameFileSelection(ttk.Frame):
         self.textbox = tk.Text(
             self, height = 1, wrap=tk.NONE, xscrollcommand=h.set)
         # demo
-        # self.textbox.insert(
-        #     tk.INSERT, r"..\data\FP-15_2024_02_29_FW_FP-15_C-wave_575nm_10.0mW_900-1400nm_Slit100_Center100_Trans_OL F-lens_1sec_SPF750LPFt800_f2-100_FW.csv") # for debug
-
         self.textbox.insert(
-            tk.INSERT, "../data/FP-15_C-wave_575nm_10.0mW_900-1400nm_Slit100_Center100_Trans_OL F-lens_1sec_SPF750LPFt800_f2-100_FW.csv") # for debug linux
+            tk.INSERT, r"..\data\FP-15_2024_02_29_FW_FP-15_C-wave_575nm_10.0mW_900-1400nm_Slit100_Center100_Trans_OL F-lens_1sec_SPF750LPFt800_f2-100_FW.csv") # for debug
+        # self.textbox.insert(
+        #     tk.INSERT, "../data/FP-15_C-wave_575nm_10.0mW_900-1400nm_Slit100_Center100_Trans_OL F-lens_1sec_SPF750LPFt800_f2-100_FW.csv") # for debug linux
 
 
         self.textbox.see(tk.END)

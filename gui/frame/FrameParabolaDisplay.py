@@ -14,11 +14,11 @@ class FrameParabolaDisplay(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.f_curve_pixel = FrameCanvas(
-            self, plt.figure(dpi = 100), size = (600, 320))
+            self, plt.figure(dpi = 100), size = (540, 320))
         self.f_curve_angle = FrameCanvas(
-            self, plt.figure(dpi = 100), size = (600, 320))
+            self, plt.figure(dpi = 100), size = (540, 320))
         self.f_curve_kParallel = FrameCanvas(
-            self, plt.figure(dpi = 100), size = (600, 320))
+            self, plt.figure(dpi = 100), size = (540, 320))
 
         # self.create_widgets()
 
