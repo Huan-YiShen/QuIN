@@ -97,6 +97,6 @@ class WindowAnalysis():
 
     def place_widgets(self):
         self.f_control.grid(row = 0, column = 0, sticky="nw")
-        self.f_paraDetect.grid(row = 1, column = 0, sticky="w")
-        self.f_paraDisplay.grid(row = 0, column = 1, rowspan= 2, sticky="ns")
+        self.f_paraDetect.grid(row = 0, column = 1, sticky="nwe")
+        self.f_paraDisplay.grid(row = 1, column = 0, columnspan= 2, sticky="wes")
         # self.label_footnote.pack(row = 3, column = 0, columnspan = 2, sticky="ews")

@@ -108,7 +108,7 @@ class FrameParabolaDetect(tk.Frame):
 
 
     def place_widgets(self):
-        self.f_curve_full.pack()
-        self.f_crop.pack()
-        self.f_curve_crop_overlay.pack()
-        self.btn_display.pack()
+        self.f_curve_full.grid(row = 0, column = 0, rowspan = 3)
+        self.f_crop.grid(row = 0, column = 1)
+        self.f_curve_crop_overlay.grid(row = 2, column = 1)
+        self.btn_display.grid(row = 3, column = 1)

@@ -33,8 +33,8 @@ class FrameImageCrop(tk.Frame):
         # state variables (storing post processing)
         self.crop_data = data
         self.crop_wl = wl
-        self.crop_pixels = (0, len(data))   # could store only starting pixel so we can get the ending via crop_data row count
-        self.crop_intensity = (np.amin(data), np.amax(data))
+        self.crop_pixel_range = (0, len(data))   # could store only starting pixel so we can get the ending via crop_data row count
+        self.crop_intensity_range = (np.amin(data), np.amax(data))
         self.fig = plt.figure(dpi = 100)
 
         self.analysis = None
@@ -60,8 +60,8 @@ class FrameImageCrop(tk.Frame):
 
         self.crop_data = data
         self.crop_wl = wl
-        self.crop_pixels = (0, len(data))
-        self.crop_intensity = (np.amin(data), np.amax(data))
+        self.crop_pixel_range = (0, len(data))
+        self.crop_intensity_range = (np.amin(data), np.amax(data))
 
 
 
@@ -97,17 +97,17 @@ class FrameImageCrop(tk.Frame):
 
         # update state variables
         self._set_cropped_var(
-            data = np.array(croppedFig),
-            wl = np.array(self.raw_wl[lw_index_min : wl_index_max]),
-            startingPx = (cpMinMax[0], cpMinMax[1]),
-            intensityRange = (ciMinMax[0], ciMinMax[1])
+            crop_data = np.array(croppedFig),
+            crop_wl = np.array(self.raw_wl[lw_index_min : wl_index_max]),
+            crop_pixelRange = (cpMinMax[0], cpMinMax[1]),
+            crop_intensityRange = (ciMinMax[0], ciMinMax[1])
             )
 
         # plot data
         try:
             print("LOG generating cropped figure...")
             plot_cropData(self.fig, self.crop_data, 
-                        self.crop_wl, self.crop_pixels)
+                        self.crop_wl, self.crop_pixel_range)
             self.f_plot.updateCanvas()
             ## plt.show() #################################################### for DEBUG
         except Exception as e:
@@ -132,18 +132,18 @@ class FrameImageCrop(tk.Frame):
         return (cpMin, cpMax), (cwMin, cwMax), (ciMin, ciMax)
 
 
-    def _set_cropped_var(self, data = [], wl = [], startingPx = (0,0), intensityRange = (0,0)):
-        self.crop_data = data
-        self.crop_wl = wl
-        self.crop_pixels = startingPx
-        self.crop_intensity = intensityRange
+    def _set_cropped_var(self, crop_data = [], crop_wl = [], crop_pixelRange = (0,0), crop_intensityRange = (0,0)):
+        self.crop_data = crop_data
+        self.crop_wl = crop_wl
+        self.crop_pixel_range = crop_pixelRange
+        self.crop_intensity_range = crop_intensityRange
 
 
     def analyze(self):
         '''
         initialize a new analysis window 
         '''
-        self.analysis = WindowAnalysis(self.crop_data, self.crop_wl, self.crop_pixels, self.crop_intensity)
+        self.analysis = WindowAnalysis(self.crop_data, self.crop_wl, self.crop_pixel_range, self.crop_intensity_range)
 
 
 

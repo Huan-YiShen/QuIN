@@ -119,7 +119,7 @@ def bound_intensity_value(
     return newArr
 
 
-def findClosestData(value, dataSet) -> int:
+def findClosestData(value : int , dataSet : list) -> int:
     index = 0
     for ind, val in enumerate(dataSet):
         if (val < value):

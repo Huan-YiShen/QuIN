@@ -65,5 +65,5 @@ class FrameParabolaDisplay(tk.Frame):
 
     def place_widgets(self):
         self.f_curve_pixel.grid(row = 0, column= 0, sticky="news")
-        self.f_curve_angle.grid(row = 1, column = 0, sticky="news")
-        self.f_curve_kParallel.grid(row = 2, column = 0, sticky="news")
+        self.f_curve_angle.grid(row = 0, column = 1, sticky="news")
+        self.f_curve_kParallel.grid(row = 0, column = 2, sticky="news")
