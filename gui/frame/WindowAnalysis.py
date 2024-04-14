@@ -5,6 +5,7 @@ import numpy as np
 
 from frame.FrameParabolaDetect import FrameParabolaDetect
 from frame.FrameParabolaDisplay import FrameParabolaDisplay
+from frame.FrameAnalysisResult import FrameAnalysisResult
 
 TITLE = "Curvature Detection"
 FOOT_NOTE = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
@@ -29,8 +30,12 @@ class WindowAnalysis():
         self.win = tk.Toplevel()
 
         self.win.title("Analysis")
-        self.win.geometry('1800x1200')
+        self.win.geometry('1600x750')
+        self.win.minsize(1600, 750)
+
         self.win.title(TITLE)
+        self.win.config(background="gray")
+
 
         self.data = data
         self.wl = wl
@@ -92,11 +97,17 @@ class WindowAnalysis():
         self.f_paraDisplay = FrameParabolaDisplay(self.win)
         self.f_paraDetect = FrameParabolaDetect(
             self.win, self.data, self.wl, self.pixelRange[0], self.f_paraDisplay)
+        self.f_result = FrameAnalysisResult(self.win)
+
         self.f_control = self.generate_controlFrame()
 
 
     def place_widgets(self):
-        self.f_control.grid(row = 0, column = 0, sticky="nw")
-        self.f_paraDetect.grid(row = 0, column = 1, sticky="nwe")
-        self.f_paraDisplay.grid(row = 1, column = 0, columnspan= 2, sticky="wes")
-        # self.label_footnote.pack(row = 3, column = 0, columnspan = 2, sticky="ews")
+        self.win.rowconfigure(4, weight=1)
+        self.win.columnconfigure(1, weight=1)
+
+        self.f_control.grid(row = 0, column = 0, sticky="news")
+        self.f_paraDetect.grid(row = 0, column = 1, padx = 10, sticky="nwe")
+        self.f_paraDisplay.grid(row = 1, column = 0, columnspan= 2, sticky="news")
+        self.f_result.grid(row = 2, column = 0, columnspan= 2, sticky="news") 
+        self.label_footnote.grid(row = 3, column = 0, columnspan = 2, sticky="ews")

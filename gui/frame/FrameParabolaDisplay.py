@@ -20,13 +20,11 @@ class FrameParabolaDisplay(tk.Frame):
         self.f_curve_kParallel = FrameCanvas(
             self, plt.figure(dpi = 100), size = (540, 320))
 
-        # self.create_widgets()
-
         # self.peak_fitting()
         self.place_widgets()
 
 
-    def update(self, max_index, max_eV, crop_index, parabola):
+    def update(self, max_index, max_eV, crop_index, parabola, parabolaVertex):
         print("update FrameParabolaDisplay")
         plot_parabola_overlay(
             fig = self.f_curve_pixel.fig, 
@@ -35,8 +33,8 @@ class FrameParabolaDisplay(tk.Frame):
             parabola_x = crop_index, 
             parabola = parabola)
 
-        self.angles = pixel2angle_linear(max_index, parabola)
-        self.crop_angles = pixel2angle_linear(crop_index, parabola)
+        self.angles = pixel2angle_linear(max_index, parabolaVertex)
+        self.crop_angles = pixel2angle_linear(crop_index, parabolaVertex)
 
         plot_parabola_overlay(
             fig = self.f_curve_angle.fig, 
@@ -46,16 +44,17 @@ class FrameParabolaDisplay(tk.Frame):
             parabola = parabola,
             x_label = "angle")
         
-        # TODO: impl anlge to angle2kParalle_linear
-        self.kpara = angle2k_ll(self.angles)
-        self.crop_kpara = angle2k_ll(self.crop_angles)
+        # TODO currently hard coded to convert m to um 
+        self.kpara = angle2k_ll(self.angles)*1e-6
+        self.crop_kpara = angle2k_ll(self.crop_angles)*1e-6
+
         plot_parabola_overlay(
             fig = self.f_curve_kParallel.fig, 
             base_x = self.kpara, 
             base_y = max_eV, 
             parabola_x = self.crop_kpara, 
             parabola = parabola,
-            x_label = "k_||")
+            x_label = r'k$_{||} (\mu m^{-1}$)')
 
 
         self.f_curve_pixel.updateCanvas()
@@ -64,6 +63,7 @@ class FrameParabolaDisplay(tk.Frame):
 
 
     def place_widgets(self):
+        self.columnconfigure(3, weight=1)
         self.f_curve_pixel.grid(row = 0, column= 0, sticky="news")
         self.f_curve_angle.grid(row = 0, column = 1, sticky="news")
         self.f_curve_kParallel.grid(row = 0, column = 2, sticky="news")

@@ -11,6 +11,7 @@ class FrameCanvas(tk.Frame):
         self.fig = figure
         self.size = size
         self.toolBar = toolBar
+        self.canvas = None
 
 
 

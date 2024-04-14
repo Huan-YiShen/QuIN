@@ -7,6 +7,10 @@ h_bar = 6.58212E-16 #[eV*sec]
 c = 3.00E+08 # [m/sec]
 me = 9.11E-31 # [kg]
 
+lambda_ref = 1010*1e-9 # [m]
+pixel_max = 115
+pixel_min = -115
+
 ###--- Function
 def lorentzian(x, x0, A, FWHM):
     return (A / np.pi) * (FWHM / 2) / ((x - x0) ** 2 + (FWHM / 2) ** 2)
@@ -29,15 +33,16 @@ def to_wl_nm(eV : np.array.__class__):
 
 
 ###--- Linear relation: pixel to angle
-def pixel2angle_linear(index_array, parabola_param):
-    pixel_max = index_array[-1]
+def pixel2angle_linear(index_array, parabolaVertex):
+    print("pixel2angle_linear(): ", parabolaVertex)
+    print("index_array: ", index_array)
+
     theta_max = np.arcsin(0.85)*180/np.pi
     slope = theta_max / pixel_max
 
-    max_index_shift = index_array - round(parabola_param[1], 0)
+    max_index_shift = index_array - round(parabolaVertex, 0)
     return slope*max_index_shift
 
 
 def angle2k_ll(angle_array):
-    lambda_ref = 1010*1e-9 # [m]
     return 2*np.pi*np.sin(angle_array*np.pi/180)/lambda_ref
