@@ -1,5 +1,5 @@
 # QuIN
-This repository records author's ongoing work at the QuIN research lab (PI Dr.Na Young Kim) in the University of Waterloo as a undergraduate research assistant. For more information about the research group, please visit the lab [website](https://research.iqc.uwaterloo.ca/quinkim/research/).
+This repository records author's ongoing work at the QuIN research lab (lead by Dr. Na Young Kim) in the University of Waterloo as a undergraduate research assistant. For more information about the research group, please visit the lab [website](https://research.iqc.uwaterloo.ca/quinkim/research/).
 
 ## dev virtual environment setup (python venv) 
 - `$ python -m venv venv` (first venv indicate the venv module, second venv is the name of your virtual environment, can be anything)

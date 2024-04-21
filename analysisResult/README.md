@@ -1,0 +1,1 @@
+default location where gui analysis results are stored
