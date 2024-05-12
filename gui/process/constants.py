@@ -22,9 +22,8 @@ def square(x, a, b, c):
     return a*(x - b)**2 + c
 
 ###--- helpers
-def to_eV( wl : np.array.__class__):
-    wl_meter = (wl)*1e-9
-    return h*c/(wl_meter)
+def to_wl( eV : np.array.__class__):
+    return (h*c)*eV*(1e9)
 
 
 def to_wl_nm(eV : np.array.__class__):
