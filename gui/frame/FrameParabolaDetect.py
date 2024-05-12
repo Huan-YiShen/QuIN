@@ -84,8 +84,12 @@ class FrameParabolaDetect(tk.Frame):
 
         lb_control = tk.Label(self.f_full, text = "Max intensity at each pixel")
 
+        # widget placement
+        self.f_curve_full.columnconfigure(index = 0, weight = 1)
+        self.f_curve_full.rowconfigure(index = 1, weight = 1)
+
         lb_control.grid(row = 0, column = 0, sticky= "we")
-        self.f_curve_full.grid(row = 1, column = 0, sticky= "we")
+        self.f_curve_full.grid(row = 1, column = 0, sticky= "news")
 
 
     def create_crop_widget(self):
@@ -99,7 +103,24 @@ class FrameParabolaDetect(tk.Frame):
 
         # finer crop control frame
         f_control = tk.Frame(self.f_crop)
+        self._create_crop_control_widgets(f_control)
 
+        # next step button
+        btn_display = ttk.Button(
+            master = self.f_crop, text = "Update Display",
+            command = lambda:self.displayFrame.update(
+                self.max_index, self.max_eV, 
+                self.crop_index, self.parabola,
+                self.parabolaVertex))
+
+        # widget placement
+        self.f_crop.rowconfigure(index = 1, weight = 1)
+        f_control.grid(row = 0, column = 0)
+        self.f_curve_crop_overlay.grid(row = 1, column = 0, sticky = "news")
+        btn_display.grid(row = 2, column = 0, sticky = "ew")
+
+
+    def _create_crop_control_widgets(self, f_control):
         lb_control = tk.Label(f_control, text = "Finer Pixel Crop Control (press <Enter-key> to crop)")
         lb_pixelMin = tk.Label(f_control, text = "Pixel Min")
         lb_pixelMax = tk.Label(f_control, text = "Pixel Max")
@@ -115,18 +136,6 @@ class FrameParabolaDetect(tk.Frame):
         lb_pixelMax.grid(row = 1, column= 2, padx=20, sticky="w")
         en_pixelMax.grid(row = 1, column= 3, sticky="we")
 
-        # next step button
-        btn_display = ttk.Button(
-            master = self.f_crop, text = "Update Display",
-            command = lambda:self.displayFrame.update(
-                self.max_index, self.max_eV, 
-                self.crop_index, self.parabola,
-                self.parabolaVertex))
-
-
-        f_control.grid(row = 0, column = 0)
-        self.f_curve_crop_overlay.grid(row = 1, column = 0, sticky = "news")
-        btn_display.grid(row = 2, column = 0, sticky = "ew")
 
 
     def _update_plot(self, *arg):
@@ -149,6 +158,17 @@ class FrameParabolaDetect(tk.Frame):
 
 
     def place_widgets(self):
-        self.columnconfigure(2, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(0, weight=1)
+
         self.f_full.grid(row = 0, column = 0, sticky = "news")
         self.f_crop.grid(row = 0, column = 1, sticky = "news")
+
+
+    def get_init_figure(self):
+        return self.f_curve_full.fig
+    
+
+    def get_fitting_figure(self):
+        return self.f_curve_crop_overlay.fig
