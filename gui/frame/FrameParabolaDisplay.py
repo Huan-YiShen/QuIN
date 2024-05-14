@@ -6,41 +6,23 @@ from process.constants import pixel2angle_linear
 from process.constants import angle2k_ll
 from process.generatePlot import plot_parabola_overlay
 from frame.FrameCanvas import FrameCanvas
+from frame.dataStruct import parabolaData
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-class parabolaData():
-    # data extracted from the 2D image directly
-    base_x = [] # pixel index 
-    base_y = [] # max eV for that pixel
-    
-    # x = pixel index of the parabola domain, base_x cropped
-    # y = parabola fix for max eV over parabola domain
-    parabola_x = [] 
-    parabola_y = []
-
-    # replace base_x and parabola_x
-    base_angles = []
-    parabola_angles = []
-
-    # replace base_x and parabola_x
-    base_kpara = []
-    parabola_kpara = []
-
 
 class FrameParabolaDisplay(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, data : parabolaData):
         super().__init__(parent)
-        self.f_curve_pixel = FrameCanvas(
+        self.fc_curve_pixel = FrameCanvas(
             self, plt.figure(dpi = 100), size = (540, 320))
-        self.f_curve_angle = FrameCanvas(
+        self.fc_curve_angle = FrameCanvas(
             self, plt.figure(dpi = 100), size = (540, 320))
-        self.f_curve_kParallel = FrameCanvas(
+        self.fc_curve_kParallel = FrameCanvas(
             self, plt.figure(dpi = 100), size = (540, 320))
 
-
-        self.data = parabolaData()
+        self.data = data
 
         # self.peak_fitting()
         self.place_widgets()
@@ -57,7 +39,7 @@ class FrameParabolaDisplay(tk.Frame):
 
         print("update FrameParabolaDisplay")
         plot_parabola_overlay(
-            fig = self.f_curve_pixel.fig, 
+            fig = self.fc_curve_pixel.fig, 
             base_x = self.data.base_x, 
             base_y = self.data.base_y,
             parabola_x = self.data.parabola_x, 
@@ -69,7 +51,7 @@ class FrameParabolaDisplay(tk.Frame):
             self.data.parabola_x, parabolaVertex)
 
         plot_parabola_overlay(
-            fig = self.f_curve_angle.fig, 
+            fig = self.fc_curve_angle.fig, 
             base_x = self.data.base_angles,
             base_y = self.data.base_y,
             parabola_x = self.data.parabola_angles,
@@ -81,7 +63,7 @@ class FrameParabolaDisplay(tk.Frame):
         self.data.parabola_kpara = angle2k_ll(self.data.parabola_angles)*1e-6
 
         plot_parabola_overlay(
-            fig = self.f_curve_kParallel.fig, 
+            fig = self.fc_curve_kParallel.fig, 
             base_x = self.data.base_kpara,
             base_y = self.data.base_y,
             parabola_x = self.data.parabola_kpara,
@@ -89,9 +71,9 @@ class FrameParabolaDisplay(tk.Frame):
             x_label = r'k$_{||} (\mu m^{-1}$)')
 
 
-        self.f_curve_pixel.updateCanvas()
-        self.f_curve_angle.updateCanvas()
-        self.f_curve_kParallel.updateCanvas()
+        self.fc_curve_pixel.updateCanvas()
+        self.fc_curve_angle.updateCanvas()
+        self.fc_curve_kParallel.updateCanvas()
 
 
     def place_widgets(self):
@@ -99,6 +81,6 @@ class FrameParabolaDisplay(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
-        self.f_curve_pixel.grid(row = 0, column= 0, sticky="news")
-        self.f_curve_angle.grid(row = 0, column = 1, sticky="news")
-        self.f_curve_kParallel.grid(row = 0, column = 2, sticky="news")
+        self.fc_curve_pixel.grid(row = 0, column= 0, sticky="news")
+        self.fc_curve_angle.grid(row = 0, column = 1, sticky="news")
+        self.fc_curve_kParallel.grid(row = 0, column = 2, sticky="news")

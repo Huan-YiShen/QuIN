@@ -5,17 +5,12 @@ import numpy as np
 
 from frame.FrameParabolaDetect import FrameParabolaDetect
 from frame.FrameParabolaDisplay import FrameParabolaDisplay
-from frame.FrameAnalysisResult import FrameAnalysisResult
+from frame.FrameAnalysisResultSave import FrameAnalysisResultSave
+from frame.dataStruct import analysisFigures
+from frame.dataStruct import parabolaData
 
 TITLE = "Curvature Detection"
 FOOT_NOTE = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
-
-class analysisFigures():
-    init_fig = None # initial figure
-    cropped_fig = None # fine turned for parabola fits
-    pixel_ev = None # pixel vs. ev with cropped parabola
-    angle_ev = None # angle vs. ev with cropped parabola 
-    kpara_ev = None # k-parallel vs. ev with cropped parabola
 
 
 '''
@@ -43,11 +38,13 @@ class WindowAnalysis():
         self.win.title(TITLE)
         self.win.config(background="gray")
 
-
         self.data = data
         self.wl = wl
         self.pixelRange = pixelRange
         self.intensityRange = intensityRange
+
+        self.resFigures = analysisFigures() # resulting figures
+        self.resData = parabolaData() # resulting data
 
         self.generate_widgets()
         self.place_widgets()
@@ -55,6 +52,14 @@ class WindowAnalysis():
         
     def close_win(self):
         self.win.destroy()
+
+
+    def populate_figures(self):
+        self.resFigures.init_fig = self.f_paraDetect.get_init_figure()
+        self.resFigures.cropped_fig = self.f_paraDetect.get_fitting_figure()
+        self.resFigures.pixel_ev = self.f_paraDisplay.fc_curve_pixel.fig
+        self.resFigures.angle_ev = self.f_paraDisplay.fc_curve_pixel.fig
+        self.resFigures.kpara_ev = self.f_paraDisplay.fc_curve_kParallel.fig        
 
 
     '''
@@ -101,18 +106,15 @@ class WindowAnalysis():
             master = self.win, bg="light gray", height = 1, anchor = "w", 
             text = FOOT_NOTE)
 
-        self.figures = analysisFigures()
-
-        self.f_paraDisplay = FrameParabolaDisplay(self.win)
+        self.f_control = self.generate_controlFrame()
+        self.f_paraDisplay = FrameParabolaDisplay(self.win, self.resData)
         self.f_paraDetect = FrameParabolaDetect(
             self.win, self.data, self.wl, self.pixelRange[0], self.f_paraDisplay)
-
-
-        self.figures.init_fig = self.f_paraDetect.get_init_figure()
-        self.figures.cropped_fig = self.f_paraDetect.get_fitting_figure()
-        self.f_result = FrameAnalysisResult(self.win, self.f_paraDetect.data)
-
-        self.f_control = self.generate_controlFrame()
+        
+        self.populate_figures()
+        
+        self.f_result = FrameAnalysisResultSave(
+            self.win, self.resData, self.resFigures)
 
 
     def place_widgets(self):
