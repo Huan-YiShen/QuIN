@@ -25,23 +25,27 @@ class AnalysisFigures():
 
 class ParabolaData():
     # data extracted from the 2D image directly
-    base_x = np.array([]) # pixel index 
-    base_y = np.array([]) # max eV for that pixel
+    base_x_pixel = np.array([]) # pixel index 
+    base_y_eV = np.array([]) # max eV for that pixel
     
-    # x = pixel index of the parabola domain, base_x cropped
+    # x = pixel index of the parabola domain, base_x_pixel cropped
     # y = parabola fix for max eV over parabola domain
-    parabola_x = np.array([]) # cropped_x
-    parabola_y = np.array([]) # cropped eV
+    parabola_x_pixel = np.array([]) # cropped_x
+    parabola_y_eV = np.array([]) # cropped eV
 
-    # base_y vs. base_angles
-    # parabola_y vs. parabola_angles
-    base_angles = np.array([])
-    parabola_angles = np.array([])
+    # base_y_eV vs. base_x_angles
+    # parabola_y_eV vs. parabola_x_angles
+    base_x_angles = np.array([])
+    parabola_x_angles = np.array([])
+    parabola_y_angles_eV = np.array([]) # recalculation of parabola_y_eV
 
-    # base_y vs. base_kpara
-    # parabola_y vs. parabola_kpara
-    base_kpara = np.array([])
-    parabola_kpara = np.array([])
+    # base_y_eV vs. base_x_kpara
+    # parabola_y_eV vs. parabola_x_kpara
+    base_x_kpara = np.array([])
+    parabola_x_kpara = np.array([])
+    parabola_y_kpara_eV = np.array([]) # recalculation of parabola_y_eV
 
     # result class
     res = None
+    min_pixel_parabola = -1
+    min_angle_parabola = -1

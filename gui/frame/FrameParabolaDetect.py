@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 class FrameParabolaDetect(tk.Frame):
     def __init__(self, parent,
-                 data, wl, initPixelVal, displayFrame = FrameParabolaDisplay.__class__):
+                 data, wl, initPixelVal, displayFrame : FrameParabolaDisplay.__class__):
 
         super().__init__(parent)
         self.config(borderwidth = 1)
@@ -25,11 +25,11 @@ class FrameParabolaDetect(tk.Frame):
         self.displayFrame = displayFrame
 
         # for full frame
-        self.parabolaVertex = 0
         self.parabola = None
         self.max_index = None
         self.max_wl = None
         self.max_eV = None
+        self.parabolaVertex = 0
 
         # for crop frame
         self.crop_pixelMin = tk.IntVar()
@@ -51,7 +51,7 @@ class FrameParabolaDetect(tk.Frame):
 
         popt = find_parabola(self.max_index, self.max_eV)
         self.parabola = square(self.max_index, popt[0], popt[1], popt[2])
-        self.parabolaVertex = popt[1]
+        self.parabolaVertex = (popt[1], popt[2])
 
         plot_parabola_overlay(
             fig = self.f_curve_full.fig, 
@@ -146,7 +146,7 @@ class FrameParabolaDetect(tk.Frame):
 
         popt = find_parabola(self.crop_index, self.crop_eV)
         self.parabola = square(self.crop_index, popt[0], popt[1], popt[2])
-        self.parabolaVertex = popt[1]
+        self.parabolaVertex = (popt[1], popt[2])
         plot_parabola_overlay(
             fig = self.f_curve_crop_overlay.fig, 
             base_x = self.crop_index, 

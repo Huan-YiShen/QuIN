@@ -7,7 +7,7 @@ import matplotlib.figure
 
 from frame.dataStruct import AnalysisFigures
 from frame.dataStruct import ParabolaData
-from process.constants import to_wl_nm
+from process.constants import to_wl_nm, h, c
 
 def split_path(file_path):
     try:
@@ -121,25 +121,32 @@ class FrameAnalysisResultSave(tk.Frame):
         # check if path exist
         directory, file = split_path(path)
         if (directory is None or file is None): 
+            print("ERR: cannot create directory or file")
             pass
 
         if (not os.path.exists(directory)):
             os.mkdir(directory)
 
         filename, extension = os.path.splitext(file)
-        if (extension is not ".csv"):
-            print("ERR: data file must end with .csv")
+        if (str(extension) != ".csv"):
+            print("ERR: data file must end with .csv, extension is: ", extension)
             pass
 
-        pathROI = directory + filename + "_ROI" + extension
-        pathParabola = directory + filename + "_Parabola" + extension
+        pathROI = directory + "\\" + filename + "_ROI" + extension
+        pathParabola = directory + "\\" + filename + "_Parabola" + extension
+        pathResult = directory + "\\" + filename + "_Result" + extension
+
+        print("LOG: save following csv data")
+        print(pathROI)
+        print(pathParabola)
+        print(pathResult)
 
         # store ROI
-        max_index = self.data.base_x
-        max_wl = to_wl_nm(self.data.base_y)
-        max_eV = self.data.base_y
-        angle = self.data.base_angles
-        k_ll_um = self.data.base_kpara
+        max_index = self.data.base_x_pixel
+        max_wl = to_wl_nm(self.data.base_y_eV)
+        max_eV = self.data.base_y_eV
+        angle = self.data.base_x_angles
+        k_ll_um = self.data.base_x_kpara
 
         data_fitting_ROI = pd.DataFrame()
         data_fitting_ROI['pixel_ROI'] = max_index
@@ -147,34 +154,40 @@ class FrameAnalysisResultSave(tk.Frame):
         data_fitting_ROI['k_ll_um_ROI'] = k_ll_um
         data_fitting_ROI['dispersion_ROI_nm'] = max_wl
         data_fitting_ROI['dispersion_ROI_eV'] = max_eV
-
         # SAVE #####
         data_fitting_ROI.to_csv(pathROI, index = False)
         # SAVE #####
 
         # fitting curve: Selected
         data_fitting_selec = pd.DataFrame()
-        data_fitting_selec['pixel_selec'] = self.data.parabola_x
-        data_fitting_selec['angle_selec'] = self.data.parabola_angles
-        data_fitting_selec['k_ll_um_selec'] = self.data.parabola_kpara
-        data_fitting_selec['dispersion_selec_nm'] = to_wl_nm(self.data.parabola_y)
-        data_fitting_selec['dispersion_selec_eV'] = self.data.parabola_y
+        data_fitting_selec['pixel_selec'] = self.data.parabola_x_pixel
+        data_fitting_selec['pixel_dispersion_selec_nm'] = to_wl_nm(self.data.parabola_y_eV)
+        data_fitting_selec['pixel_dispersion_selec_eV'] = self.data.parabola_y_eV
+        data_fitting_selec['angle_selec'] = self.data.parabola_x_angles
+        data_fitting_selec['angle_dispersion_selec_nm'] = to_wl_nm(self.data.parabola_y_angles_eV)
+        data_fitting_selec['angle_dispersion_selec_eV'] = self.data.parabola_y_angles_eV
+        data_fitting_selec['k_ll_um_selec'] = self.data.parabola_x_kpara
+        data_fitting_selec['k_ll_um_dispersion_selec_nm'] = to_wl_nm(self.data.parabola_y_kpara_eV)
+        data_fitting_selec['k_ll_um_dispersion_selec_eV'] = self.data.parabola_y_kpara_eV
         # SAVE #####
         data_fitting_selec.to_csv(pathParabola, index = False)
         # SAVE #####
 
         # # fitting parameters
-        # column_order = ['m_eff', 'm_eff_rel', 'min_wavelength (nm)', 'min_eV (eV)']
-        # result = [m_eff, m_eff_rel, h*c/popt2[2]*1e9, popt3[2]]
-        # result_collection = pd.DataFrame(result).T
-        # result_collection.columns = column_order
+        column_order = ['m_eff', 'm_eff_rel', 'min_wavelength (nm)', 'min_eV (eV)']
+        res = self.data.res
+        result = [res.m_eff, res.m_eff_rel, h*c/(self.data.min_pixel_parabola)*1e9, self.data.min_angle_parabola]
+        result_collection = pd.DataFrame(result).T
+        result_collection.columns = column_order
+        # SAVE #####
+        result_collection.to_csv(pathResult, index = False)
+        # SAVE #####
 
-        # result_collection.to_csv(path_csv_store + file[:-4]+'_' +str(wl_ini) +'-' + str(wl_las) +'nm' + '_result_Linear.csv', index = False)
 
 
     def save_fig(self, fig : matplotlib.figure.__class__, figPath : str = "unnamed_figure.jpg"):
         print("LOG: saving figure")
-        directory, filename = split_path(figPath)
+        directory, _ = split_path(figPath)
         if (not os.path.exists(directory)):
             os.mkdir(directory)
 
