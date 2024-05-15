@@ -27,7 +27,7 @@ def to_wl( eV : np.array.__class__):
 
 
 def to_wl_nm(eV : np.array.__class__):
-    wl_nm = (eV)*1e9
+    wl_nm = eV*(1e9)
     return h*c/wl_nm
 
 

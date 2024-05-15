@@ -6,8 +6,8 @@ import numpy as np
 from frame.FrameParabolaDetect import FrameParabolaDetect
 from frame.FrameParabolaDisplay import FrameParabolaDisplay
 from frame.FrameAnalysisResultSave import FrameAnalysisResultSave
-from frame.dataStruct import analysisFigures
-from frame.dataStruct import parabolaData
+from frame.dataStruct import AnalysisFigures
+from frame.dataStruct import ParabolaData
 
 TITLE = "Curvature Detection"
 FOOT_NOTE = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
@@ -17,7 +17,6 @@ FOOT_NOTE = "© QuIN Lab, 2024 Huan Yi Shen v0.1"
 Analysis window
 '''
 class WindowAnalysis():
-
     def __init__(
         self, data : np.array.__class__ = np.array([]), 
         wl : np.array.__class__ = np.array([]), 
@@ -43,8 +42,8 @@ class WindowAnalysis():
         self.pixelRange = pixelRange
         self.intensityRange = intensityRange
 
-        self.resFigures = analysisFigures() # resulting figures
-        self.resData = parabolaData() # resulting data
+        self.resFigures = AnalysisFigures() # resulting figures
+        self.resData = ParabolaData() # resulting data
 
         self.generate_widgets()
         self.place_widgets()

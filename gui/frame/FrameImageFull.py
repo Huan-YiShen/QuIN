@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from frame.FrameCanvas import FrameCanvas
 from process.generatePlot import plot_rawData
 
-def path_leaf(path):
+def path_leaf(path): # move this to general 
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 
